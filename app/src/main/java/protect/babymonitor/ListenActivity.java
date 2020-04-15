@@ -22,7 +22,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import android.app.Activity;
-import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -45,15 +44,15 @@ public class ListenActivity extends Activity
     NotificationManagerCompat _mNotifyMgr;
 
     Thread _listenThread;
-    private void streamAudio(final Socket socket) throws IllegalArgumentException, IllegalStateException, IOException
+    private final int frequency = 11025;
+    private final int channelConfiguration = AudioFormat.CHANNEL_OUT_MONO;
+    private final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
+    private final int bufferSize = AudioTrack.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
+    private final int byteBufferSize = bufferSize*2;
+
+    private void streamAudio(final Socket socket, AudioListener listener) throws IllegalArgumentException, IllegalStateException, IOException
     {
         Log.i(TAG, "Setting up stream");
-
-        final int frequency = 11025;
-        final int channelConfiguration = AudioFormat.CHANNEL_OUT_MONO;
-        final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
-        final int bufferSize = AudioTrack.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
-        final int byteBufferSize = bufferSize*2;
 
         final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                 frequency,
@@ -80,6 +79,9 @@ public class ListenActivity extends Activity
                 if(read > 0)
                 {
                     audioTrack.write(buffer, 0, read);
+                    byte[] readBytes = new byte[read];
+                    System.arraycopy(buffer, 0, readBytes, 0, read);
+                    listener.onAudio(readBytes);
                 }
             }
         }
@@ -120,6 +122,20 @@ public class ListenActivity extends Activity
         final TextView statusText = (TextView) findViewById(R.id.textStatus);
         statusText.setText(R.string.listening);
 
+        final VolumeView volumeView = (VolumeView) findViewById(R.id.volume);
+
+        final AudioListener listener = new AudioListener() {
+            @Override
+            public void onAudio(final byte[] audioData) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        volumeView.onAudioData(audioData);
+                    }
+                });
+            }
+        };
+
 
         _listenThread = new Thread(new Runnable()
         {
@@ -129,7 +145,7 @@ public class ListenActivity extends Activity
                 try
                 {
                     final Socket socket = new Socket(_address, _port);
-                    streamAudio(socket);
+                    streamAudio(socket, listener);
                 }
                 catch (UnknownHostException e)
                 {
