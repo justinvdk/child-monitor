@@ -27,7 +27,7 @@ public class VolumeView extends View {
         double sum = 0;
         for (int i = 0; i < data.length; i++) {
             double rel = Math.abs(data[i]) / (double)32767f;
-            sum+=rel;
+            sum+=Math.pow(rel, 4);
         }
         volume = sum/data.length;
         if (volume > maxVolume) {
@@ -41,7 +41,7 @@ public class VolumeView extends View {
         double relativeBrightness = 0;
         if (maxVolume > 0) {
             relativeBrightness = volume / (float) maxVolume;
-            relativeBrightness = Math.max(0.2, relativeBrightness );
+            relativeBrightness = Math.max(0.3, relativeBrightness);
         }
         int blue;
         int rest;
@@ -49,7 +49,7 @@ public class VolumeView extends View {
             blue = 255;
             rest = (int) (2 * 255 * (relativeBrightness - 0.5));
         } else {
-            blue = (int) (2 * 255 * relativeBrightness);
+            blue = (int) (255 * (relativeBrightness - 0.2) / 0.3);
             rest = 0;
         }
         int rgb = Color.rgb(rest, rest, blue);
