@@ -114,7 +114,7 @@ public class MonitorActivity extends Activity
                     try
                     {
                         // Initialize a server socket on the next available port.
-                        serverSocket = new ServerSocket(0);
+                        serverSocket = new ServerSocket(10000);
 
                         // Store the chosen port.
                         final int localPort = serverSocket.getLocalPort();
