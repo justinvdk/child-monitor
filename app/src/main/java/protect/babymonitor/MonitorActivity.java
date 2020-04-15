@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import android.app.Activity;
 import android.content.Context;
@@ -45,7 +48,13 @@ public class MonitorActivity extends Activity
 
     NsdManager.RegistrationListener _registrationListener;
 
-    Thread _serviceThread;
+    ServerSocket currentSocket = null;
+
+    Executor singleThreadExecutor = Executors.newSingleThreadExecutor();
+
+    Object connectionToken = null;
+
+    int currentPort = 10000;
 
     private void serviceConnection(Socket socket) throws IOException
     {
@@ -101,21 +110,18 @@ public class MonitorActivity extends Activity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monitor);
+        final Object currentToken = new Object();
+        connectionToken = currentToken;
 
-        _serviceThread = new Thread(new Runnable()
-        {
+        singleThreadExecutor.execute(new Runnable() {
             @Override
             public void run()
             {
-                while(Thread.currentThread().isInterrupted() == false)
+                while(Objects.equals(connectionToken, currentToken))
                 {
-                    ServerSocket serverSocket = null;
-
-                    try
+                    try (ServerSocket serverSocket = new ServerSocket(currentPort))
                     {
-                        // Initialize a server socket on the next available port.
-                        serverSocket = new ServerSocket(10000);
-
+                        currentSocket = serverSocket;
                         // Store the chosen port.
                         final int localPort = serverSocket.getLocalPort();
 
@@ -124,48 +130,28 @@ public class MonitorActivity extends Activity
                         registerService(localPort);
 
                         // Wait for a parent to find us and connect
-                        Socket socket = serverSocket.accept();
-                        Log.i(TAG, "Connection from parent device received");
+                        try {
+                            Socket socket = serverSocket.accept();
+                            Log.i(TAG, "Connection from parent device received");
 
-                        // We now have a client connection.
-                        // Unregister so no other clients will
-                        // attempt to connect
-                        serverSocket.close();
-                        serverSocket = null;
-                        unregisterService();
-
-                        try
-                        {
+                            // We now have a client connection.
+                            // Unregister so no other clients will
+                            // attempt to connect
+                            unregisterService();
                             serviceConnection(socket);
-                        }
-                        finally
-                        {
-                            socket.close();
+                        } catch (IOException e) {
+                            Log.e(TAG, "Connection failed", e);
                         }
                     }
                     catch(IOException e)
                     {
-                        Log.e(TAG, "Connection failed", e);
-                    }
-
-                    // If an exception was thrown before the connection
-                    // could be closed, clean it up
-                    if(serverSocket != null)
-                    {
-                        try
-                        {
-                            serverSocket.close();
-                        }
-                        catch (IOException e)
-                        {
-                            Log.e(TAG, "Failed to close stray connection", e);
-                        }
-                        serverSocket = null;
+                        // Just in case
+                        currentPort++;
+                        Log.e(TAG, "Failed to open server socket. Port increased to " + currentPort, e);
                     }
                 }
             }
         });
-        _serviceThread.start();
 
         final TextView addressText = (TextView) findViewById(R.id.address);
 
@@ -194,10 +180,14 @@ public class MonitorActivity extends Activity
 
         unregisterService();
 
-        if(_serviceThread != null)
+        connectionToken = null;
+        if(currentSocket != null)
         {
-            _serviceThread.interrupt();
-            _serviceThread = null;
+            try {
+                currentSocket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to close active socket on port "+currentPort);
+            }
         }
 
         super.onDestroy();
