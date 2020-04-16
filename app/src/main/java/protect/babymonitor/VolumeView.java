@@ -78,8 +78,8 @@ public class VolumeView extends View {
         if (maxVolume > 0) {
             double margins = height * 0.1;
             double graphHeight = height - 2*margins;
-            int yPrev = (int) margins;
             int leftMost = Math.max(0, volumeHistory.size() - width);
+            int yPrev = (int) (graphHeight - margins);
             for (int i = leftMost; i < volumeHistory.size() && i - leftMost < width; i++) {
                 int xNext = i - leftMost;
                 int yNext = (int) (margins + graphHeight - volumeHistory.get(i) / maxVolume * (graphHeight));
@@ -88,6 +88,9 @@ public class VolumeView extends View {
                     xPrev = xNext;
                 } else {
                     xPrev = xNext - 1;
+                }
+                if (i == leftMost && i > 0){
+                    yPrev = (int) (margins + graphHeight - volumeHistory.get(i-1) / maxVolume * (graphHeight));
                 }
                 canvas.drawLine(xPrev, yPrev, xNext, yNext, paint);
                 yPrev = yNext;
