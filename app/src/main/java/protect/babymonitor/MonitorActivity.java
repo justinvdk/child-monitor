@@ -36,25 +36,23 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.format.Formatter;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.TextView;
 
 public class MonitorActivity extends Activity
 {
-    final String TAG = "BabyMonitor";
+    final static String TAG = "BabyMonitor";
 
-    NsdManager _nsdManager;
+    NsdManager nsdManager;
 
-    NsdManager.RegistrationListener _registrationListener;
+    NsdManager.RegistrationListener registrationListener;
 
-    ServerSocket currentSocket = null;
+    ServerSocket currentSocket;
 
-    Executor singleThreadExecutor = Executors.newSingleThreadExecutor();
+    Executor singleThreadExecutor;
 
-    Object connectionToken = null;
+    Object connectionToken;
 
-    int currentPort = 10000;
+    int currentPort;
 
     private void serviceConnection(Socket socket) throws IOException
     {
@@ -73,9 +71,13 @@ public class MonitorActivity extends Activity
         final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 
         final int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
-        final AudioRecord audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                frequency, channelConfiguration,
-                audioEncoding, bufferSize);
+        final AudioRecord audioRecord = new AudioRecord(
+                MediaRecorder.AudioSource.MIC,
+                frequency,
+                channelConfiguration,
+                audioEncoding,
+                bufferSize
+        );
 
         final int byteBufferSize = bufferSize*2;
         final byte[] buffer = new byte[byteBufferSize];
@@ -105,11 +107,13 @@ public class MonitorActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         Log.i(TAG, "Baby monitor start");
-
-        _nsdManager = (NsdManager)this.getSystemService(Context.NSD_SERVICE);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monitor);
+
+        singleThreadExecutor = Executors.newSingleThreadExecutor();
+        nsdManager = (NsdManager)this.getSystemService(Context.NSD_SERVICE);
+        currentPort = 10000;
+        currentSocket = null;
         final Object currentToken = new Object();
         connectionToken = currentToken;
 
@@ -200,7 +204,7 @@ public class MonitorActivity extends Activity
         serviceInfo.setServiceType("_babymonitor._tcp.");
         serviceInfo.setPort(port);
 
-        _registrationListener = new NsdManager.RegistrationListener()
+        registrationListener = new NsdManager.RegistrationListener()
         {
             @Override
             public void onServiceRegistered(NsdServiceInfo nsdServiceInfo) {
@@ -252,8 +256,8 @@ public class MonitorActivity extends Activity
             }
         };
 
-        _nsdManager.registerService(
-                serviceInfo, NsdManager.PROTOCOL_DNS_SD, _registrationListener);
+        nsdManager.registerService(
+                serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
     }
 
     /**
@@ -262,12 +266,12 @@ public class MonitorActivity extends Activity
      */
     private void unregisterService()
     {
-        if(_registrationListener != null)
+        if(registrationListener != null)
         {
             Log.i(TAG, "Unregistering monitoring service");
 
-            _nsdManager.unregisterService(_registrationListener);
-            _registrationListener = null;
+            nsdManager.unregisterService(registrationListener);
+            registrationListener = null;
         }
     }
 }

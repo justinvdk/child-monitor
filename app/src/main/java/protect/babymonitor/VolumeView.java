@@ -13,10 +13,10 @@ import java.util.LinkedList;
 
 public class VolumeView extends View {
     private static final int MAX_HISTORY = 10_000;
-    private double volume = 0;
-    private double maxVolume = 0;
-    private Paint paint = new Paint();
-    private LinkedList<Double> volumeHistory = new LinkedList<>();
+    private double volume;
+    private double maxVolume;
+    private Paint paint;
+    private LinkedList<Double> volumeHistory;
 
     public VolumeView(Context context) {
         super(context);
@@ -34,6 +34,10 @@ public class VolumeView extends View {
     }
 
     private void init() {
+        volume = 0;
+        maxVolume = 0;
+        paint = new Paint();
+        volumeHistory = new LinkedList<>();
         paint.setColor(Color.rgb(255, 127, 0));
     }
 
