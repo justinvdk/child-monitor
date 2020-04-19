@@ -42,17 +42,15 @@ public class MonitorActivity extends Activity
 {
     final static String TAG = "BabyMonitor";
 
-    NsdManager nsdManager;
+    private NsdManager nsdManager;
 
-    NsdManager.RegistrationListener registrationListener;
+    private NsdManager.RegistrationListener registrationListener;
 
-    ServerSocket currentSocket;
+    private ServerSocket currentSocket;
 
-    Executor singleThreadExecutor;
+    private Object connectionToken;
 
-    Object connectionToken;
-
-    int currentPort;
+    private int currentPort;
 
     private void serviceConnection(Socket socket) throws IOException
     {
@@ -110,7 +108,7 @@ public class MonitorActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monitor);
 
-        singleThreadExecutor = Executors.newSingleThreadExecutor();
+        Executor singleThreadExecutor = Executors.newSingleThreadExecutor();
         nsdManager = (NsdManager)this.getSystemService(Context.NSD_SERVICE);
         currentPort = 10000;
         currentSocket = null;
