@@ -21,8 +21,6 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Objects;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import android.app.Activity;
 import android.content.Context;
@@ -38,8 +36,7 @@ import android.text.format.Formatter;
 import android.util.Log;
 import android.widget.TextView;
 
-public class MonitorActivity extends Activity
-{
+public class MonitorActivity extends Activity {
     final static String TAG = "BabyMonitor";
 
     private NsdManager nsdManager;
@@ -52,77 +49,69 @@ public class MonitorActivity extends Activity
 
     private int currentPort;
 
-    private void serviceConnection(Socket socket) throws IOException
-    {
-        MonitorActivity.this.runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                final TextView statusText = (TextView) findViewById(R.id.textStatus);
-                statusText.setText(R.string.streaming);
+    private void serviceConnection(Socket socket) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run()
+                {
+                    final TextView statusText = (TextView) findViewById(R.id.textStatus);
+                    statusText.setText(R.string.streaming);
+                }
+            });
+
+            final int frequency = 11025;
+            final int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
+            final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
+
+            final int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
+            final AudioRecord audioRecord = new AudioRecord(
+                    MediaRecorder.AudioSource.MIC,
+                    frequency,
+                    channelConfiguration,
+                    audioEncoding,
+                    bufferSize
+            );
+
+            final int byteBufferSize = bufferSize*2;
+            final byte[] buffer = new byte[byteBufferSize];
+
+            try {
+                audioRecord.startRecording();
+                final OutputStream out = socket.getOutputStream();
+
+                socket.setSendBufferSize(byteBufferSize);
+                Log.d(TAG, "Socket send buffer size: " + socket.getSendBufferSize());
+
+                while (socket.isConnected() && !Thread.currentThread().isInterrupted()) {
+                    final int read = audioRecord.read(buffer, 0, bufferSize);
+                    out.write(buffer, 0, read);
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Connection failed", e);
+            } finally {
+                audioRecord.stop();
             }
-        });
-
-        final int frequency = 11025;
-        final int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
-        final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
-
-        final int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
-        final AudioRecord audioRecord = new AudioRecord(
-                MediaRecorder.AudioSource.MIC,
-                frequency,
-                channelConfiguration,
-                audioEncoding,
-                bufferSize
-        );
-
-        final int byteBufferSize = bufferSize*2;
-        final byte[] buffer = new byte[byteBufferSize];
-
-        try
-        {
-            audioRecord.startRecording();
-
-            final OutputStream out = socket.getOutputStream();
-
-            socket.setSendBufferSize(byteBufferSize);
-            Log.d(TAG, "Socket send buffer size: " + socket.getSendBufferSize());
-
-            while (socket.isConnected() && Thread.currentThread().isInterrupted() == false)
-            {
-                final int read = audioRecord.read(buffer, 0, bufferSize);
-                out.write(buffer, 0, read);
-            }
-        }
-        finally
-        {
-            audioRecord.stop();
-        }
     }
 
+
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "Baby monitor start");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monitor);
 
-        Executor singleThreadExecutor = Executors.newSingleThreadExecutor();
         nsdManager = (NsdManager)this.getSystemService(Context.NSD_SERVICE);
         currentPort = 10000;
         currentSocket = null;
         final Object currentToken = new Object();
         connectionToken = currentToken;
 
-        singleThreadExecutor.execute(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run()
             {
-                while(Objects.equals(connectionToken, currentToken))
-                {
-                    try (ServerSocket serverSocket = new ServerSocket(currentPort))
-                    {
+                while(Objects.equals(connectionToken, currentToken)) {
+                    try (ServerSocket serverSocket = new ServerSocket(currentPort)) {
                         currentSocket = serverSocket;
                         // Store the chosen port.
                         final int localPort = serverSocket.getLocalPort();
@@ -132,8 +121,7 @@ public class MonitorActivity extends Activity
                         registerService(localPort);
 
                         // Wait for a parent to find us and connect
-                        try {
-                            Socket socket = serverSocket.accept();
+                        try (Socket socket = serverSocket.accept()) {
                             Log.i(TAG, "Connection from parent device received");
 
                             // We now have a client connection.
@@ -141,19 +129,15 @@ public class MonitorActivity extends Activity
                             // attempt to connect
                             unregisterService();
                             serviceConnection(socket);
-                        } catch (IOException e) {
-                            Log.e(TAG, "Connection failed", e);
                         }
-                    }
-                    catch(IOException e)
-                    {
+                    } catch(IOException e) {
                         // Just in case
                         currentPort++;
                         Log.e(TAG, "Failed to open server socket. Port increased to " + currentPort, e);
                     }
                 }
             }
-        });
+        }).start();
 
         final TextView addressText = (TextView) findViewById(R.id.address);
 
@@ -162,29 +146,24 @@ public class MonitorActivity extends Activity
                 (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         final WifiInfo info = wifiManager.getConnectionInfo();
         final int address = info.getIpAddress();
-        if(address != 0)
-        {
+        if(address != 0) {
             @SuppressWarnings("deprecation")
             final String ipAddress = Formatter.formatIpAddress(address);
             addressText.setText(ipAddress);
-        }
-        else
-        {
+        } else {
             addressText.setText(R.string.wifiNotConnected);
         }
 
     }
 
     @Override
-    protected void onDestroy()
-    {
+    protected void onDestroy() {
         Log.i(TAG, "Baby monitor stop");
 
         unregisterService();
 
         connectionToken = null;
-        if(currentSocket != null)
-        {
+        if(currentSocket != null) {
             try {
                 currentSocket.close();
             } catch (IOException e) {
@@ -195,15 +174,13 @@ public class MonitorActivity extends Activity
         super.onDestroy();
     }
 
-    private void registerService(final int port)
-    {
+    private void registerService(final int port) {
         final NsdServiceInfo serviceInfo  = new NsdServiceInfo();
         serviceInfo.setServiceName("ProtectBabyMonitor");
         serviceInfo.setServiceType("_babymonitor._tcp.");
         serviceInfo.setPort(port);
 
-        registrationListener = new NsdManager.RegistrationListener()
-        {
+        registrationListener = new NsdManager.RegistrationListener() {
             @Override
             public void onServiceRegistered(NsdServiceInfo nsdServiceInfo) {
                 // Save the service name.  Android may have changed it in order to
@@ -230,15 +207,13 @@ public class MonitorActivity extends Activity
             }
 
             @Override
-            public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode)
-            {
+            public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
                 // Registration failed!  Put debugging code here to determine why.
                 Log.e(TAG, "Registration failed: " + errorCode);
             }
 
             @Override
-            public void onServiceUnregistered(NsdServiceInfo arg0)
-            {
+            public void onServiceUnregistered(NsdServiceInfo arg0) {
                 // Service has been unregistered.  This only happens when you call
                 // NsdManager.unregisterService() and pass in this listener.
 
@@ -246,8 +221,7 @@ public class MonitorActivity extends Activity
             }
 
             @Override
-            public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode)
-            {
+            public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
                 // Unregistration failed.  Put debugging code here to determine why.
 
                 Log.e(TAG, "Unregistration failed: " + errorCode);
@@ -262,10 +236,8 @@ public class MonitorActivity extends Activity
      * Uhregistered the service and assigns the listener
      * to null.
      */
-    private void unregisterService()
-    {
-        if(registrationListener != null)
-        {
+    private void unregisterService() {
+        if(registrationListener != null) {
             Log.i(TAG, "Unregistering monitoring service");
 
             nsdManager.unregisterService(registrationListener);

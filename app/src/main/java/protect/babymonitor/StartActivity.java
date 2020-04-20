@@ -16,9 +16,13 @@
  */
 package protect.babymonitor;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,10 +30,10 @@ import android.widget.Button;
 public class StartActivity extends Activity
 {
     static final String TAG = "BabyMonitor";
+    private final static int PERMISSIONS_REQUEST_RECORD_AUDIO = 298349824;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "Baby monitor launched");
 
         super.onCreate(savedInstanceState);
@@ -43,8 +47,11 @@ public class StartActivity extends Activity
             {
                 Log.i(TAG, "Starting up monitor");
 
-                Intent i = new Intent(getApplicationContext(), MonitorActivity.class);
-                startActivity(i);
+                if (isAudioRecordingPermissionGranted()) {
+                    startActivity(new Intent(getApplicationContext(), MonitorActivity.class));
+                } else {
+                    requestAudioPermission();
+                }
             }
         });
 
@@ -55,10 +62,28 @@ public class StartActivity extends Activity
             public void onClick(View v)
             {
                 Log.i(TAG, "Starting connection activity");
-
                 Intent i = new Intent(getApplicationContext(), DiscoverActivity.class);
                 startActivity(i);
             }
         });
+    }
+
+    private boolean isAudioRecordingPermissionGranted() {
+        return ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestAudioPermission() {
+        ActivityCompat.requestPermissions(StartActivity.this,
+                new String[]{Manifest.permission.RECORD_AUDIO},
+                PERMISSIONS_REQUEST_RECORD_AUDIO);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startActivity(new Intent(getApplicationContext(), MonitorActivity.class));
+        }
     }
 }
