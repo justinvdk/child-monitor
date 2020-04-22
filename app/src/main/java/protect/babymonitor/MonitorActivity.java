@@ -59,9 +59,9 @@ public class MonitorActivity extends Activity {
                 }
             });
 
-            final int frequency = 11025;
-            final int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
-            final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
+            final int frequency = AudioCodecDefines.FREQUENCY;
+            final int channelConfiguration = AudioCodecDefines.CHANNEL_CONFIGURATION_IN;
+            final int audioEncoding = AudioCodecDefines.ENCODING;
 
             final int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
             final AudioRecord audioRecord = new AudioRecord(

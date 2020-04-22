@@ -44,9 +44,9 @@ public class ListenActivity extends Activity
     NotificationManagerCompat _mNotifyMgr;
 
     Thread _listenThread;
-    private final int frequency = 11025;
-    private final int channelConfiguration = AudioFormat.CHANNEL_OUT_MONO;
-    private final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
+    private final int frequency = AudioCodecDefines.FREQUENCY;
+    private final int channelConfiguration = AudioCodecDefines.CHANNEL_CONFIGURATION_OUT;
+    private final int audioEncoding = AudioCodecDefines.ENCODING;
     private final int bufferSize = AudioTrack.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
     private final int byteBufferSize = bufferSize*2;
 
