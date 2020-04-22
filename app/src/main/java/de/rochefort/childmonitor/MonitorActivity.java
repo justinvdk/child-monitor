@@ -1,20 +1,20 @@
 /**
- * This file is part of the Protect Baby Monitor.
+ * This file is part of the Child Monitor.
  *
- * Protect Baby Monitor is free software: you can redistribute it and/or modify
+ * Child Monitor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Protect Baby Monitor is distributed in the hope that it will be useful,
+ * Child Monitor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Protect Baby Monitor. If not, see <http://www.gnu.org/licenses/>.
+ * along with Child Monitor. If not, see <http://www.gnu.org/licenses/>.
  */
-package protect.babymonitor;
+package de.rochefort.childmonitor;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,7 +24,6 @@ import java.util.Objects;
 
 import android.app.Activity;
 import android.content.Context;
-import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.net.nsd.NsdManager;
@@ -37,7 +36,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 public class MonitorActivity extends Activity {
-    final static String TAG = "BabyMonitor";
+    final static String TAG = "ChildMonitor";
 
     private NsdManager nsdManager;
 
@@ -96,7 +95,7 @@ public class MonitorActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "Baby monitor start");
+        Log.i(TAG, "ChildMonitor start");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monitor);
 
@@ -158,7 +157,7 @@ public class MonitorActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        Log.i(TAG, "Baby monitor stop");
+        Log.i(TAG, "ChildMonitor stop");
 
         unregisterService();
 
@@ -176,8 +175,8 @@ public class MonitorActivity extends Activity {
 
     private void registerService(final int port) {
         final NsdServiceInfo serviceInfo  = new NsdServiceInfo();
-        serviceInfo.setServiceName("ProtectBabyMonitor");
-        serviceInfo.setServiceType("_babymonitor._tcp.");
+        serviceInfo.setServiceName("ChildMonitor");
+        serviceInfo.setServiceType("_childmonitor._tcp.");
         serviceInfo.setPort(port);
 
         registrationListener = new NsdManager.RegistrationListener() {

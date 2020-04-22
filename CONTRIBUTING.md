@@ -1,9 +1,9 @@
-How to Submit Patches to the Protect Baby Monitor Project
+How to Submit Patches to the Child Monitor Project
 ===============================================================================
-https://github.com/brarcher/budget-watch
+https://github.com/enguerrand/child-monitor
 
 This document is intended to act as a guide to help you contribute to the
-Protect Baby Monitor project.  It is not perfect, and there will always be exceptions
+Child Monitor project.  It is not perfect, and there will always be exceptions
 to the rules described here, but by following the instructions below you
 should have a much easier time getting your work merged with the upstream
 project.
@@ -27,13 +27,6 @@ and FindBugs, run using:
 
 The final check is by testing the application on a live device and verifying
 the basic functionality works as expected.
-
-## Make Sure Your Code is Tested
-
-The Protect Baby Monitor code uses a fair number of unit tests to verify that
-the basic functionality is working. Submissions which add functionality
-or significantly change the existing code should include additional tests
-to verify the proper operation of the proposed changes.
 
 ## Explain Your Work
 
@@ -85,7 +78,7 @@ your real name, saying:
 ## Submit Patch(es) for Review
 
 Finally, you will need to submit your patches so that they can be reviewed
-and potentially merged into the main Protect Baby Monitor repository. The preferred
-way to do this is to submit a Pull Request to the Protect Baby Monitor project.
+and potentially merged into the main Child Monitor repository. The preferred
+way to do this is to submit a Pull Request to the Child Monitor project.
 Changes need to apply cleanly onto the master branch and pass all
 unit tests and produce no errors during static analysis.

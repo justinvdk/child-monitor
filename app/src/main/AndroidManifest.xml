@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="protect.babymonitor"
+    package="de.rochefort.childmonitor"
     android:versionCode="2"
     android:versionName="0.2" >
 
@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo" >
         <activity
-            android:name="protect.babymonitor.StartActivity"
+            android:name="de.rochefort.childmonitor.StartActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|screenSize"
             >
@@ -24,23 +24,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="protect.babymonitor.MonitorActivity"
+            android:name="de.rochefort.childmonitor.MonitorActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName="protect.babymonitor.StartActivity"
+            android:parentActivityName="de.rochefort.childmonitor.StartActivity"
             />
         <activity
-            android:name="protect.babymonitor.DiscoverActivity"
+            android:name="de.rochefort.childmonitor.DiscoverActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="adjustPan"
-            android:parentActivityName="protect.babymonitor.StartActivity"
+            android:parentActivityName="de.rochefort.childmonitor.StartActivity"
             />
         <activity
-            android:name="protect.babymonitor.ListenActivity"
+            android:name="de.rochefort.childmonitor.ListenActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName="protect.babymonitor.DiscoverActivity"
+            android:parentActivityName="de.rochefort.childmonitor.DiscoverActivity"
             />
     </application>
 

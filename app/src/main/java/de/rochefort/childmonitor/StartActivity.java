@@ -1,20 +1,20 @@
 /**
- * This file is part of the Protect Baby Monitor.
+ * This file is part of the Child Monitor.
  *
- * Protect Baby Monitor is free software: you can redistribute it and/or modify
+ * Child Monitor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Protect Baby Monitor is distributed in the hope that it will be useful,
+ * Child Monitor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Protect Baby Monitor. If not, see <http://www.gnu.org/licenses/>.
+ * along with Child Monitor. If not, see <http://www.gnu.org/licenses/>.
  */
-package protect.babymonitor;
+package de.rochefort.childmonitor;
 
 import android.Manifest;
 import android.app.Activity;
@@ -29,12 +29,12 @@ import android.widget.Button;
 
 public class StartActivity extends Activity
 {
-    static final String TAG = "BabyMonitor";
+    static final String TAG = "ChildMonitor";
     private final static int PERMISSIONS_REQUEST_RECORD_AUDIO = 298349824;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "Baby monitor launched");
+        Log.i(TAG, "ChildMonitor launched");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);

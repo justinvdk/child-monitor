@@ -7,14 +7,14 @@ findbugs {
 }
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
 
     defaultConfig {
-        applicationId "protect.babymonitor"
+        applicationId "child.monitor"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 3
-        versionName "0.3"
+        versionCode 4
+        versionName "0.4"
     }
 
     buildTypes {
@@ -25,7 +25,7 @@ android {
     }
 
     dependencies {
-        compile "com.android.support:support-compat:25.4.0"
+        compile "com.android.support:support-compat:26.1.0"
     }
 }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">安全ベビー モニター</string>
+    <string name="app_name">子モニター</string>
     <string name="action_settings">設定</string>
     <string name="useAsParentDevice">親機として使用する</string>
     <string name="useAsChildDevice">子機として使用する</string>

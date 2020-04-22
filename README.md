@@ -1,35 +1,25 @@
-# Protect Baby Monitor
-An Open Source Baby Monitor for Android
+# Child Monitor
+An Open Source Child Monitor for Android
 
-[![Build Status](https://travis-ci.org/brarcher/protect-baby-monitor.svg?branch=master)](https://travis-ci.org/brarcher/protect-baby-monitor)
-
-[![F-Droid](https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Get_it_on_F-Droid.svg/160px-Get_it_on_F-Droid.svg.png)](https://f-droid.org/repository/browse/?fdid=protect.babymonitor "Protect Baby Monitor on F-Droid")
-
-_Protect Baby Monitor_ allows two Android devices to act as a baby monitor. The first device,
+_Child Monitor_ allows two Android devices to act as a baby monitor. The first device,
 left in the room with the baby, will advertise itself on the network and stream audio
 to a connected client. The second device, with the parent, will connect to the monitoring
 device and receive an audio stream.
 
-_Protect Baby Monitor_ works on Android 4.1 (Jelly Bean) and newer, i.e. Android SDK 16.
+The project is a fork of _Protect Baby Monitor_ which is declared as "on hiatus" by its developer.
 
-The current version of _Protect Baby Monitor_ is rudimentary at best. It is capable
+_Child Monitor_ works on Android 4.4 (KitKat) and newer, i.e. Android SDK 19.
+
+The current version of _Child Monitor_ is rudimentary at best. It is capable
 of successfully advertising itself on the network, allows clients to connect,
 and streams audio. Room for improvement includes:
 
 1. Robust usage of the AudioTrack API
 2. Handle dropped packets gracefully
+3. Use of GSM when no internet connectivity is available
 
-At the time this project was started there was no obvious open source solution for a
-baby monitor for Android. There are both free and paid options available for Android,
-including:
-
-- [Baby Monitor Wifi](https://play.google.com/store/apps/details?id=com.bluechillie.babyphone)
-- [Dormi](https://play.google.com/store/apps/details?id=com.sleekbit.dormi)
-- [Baby Monitor](https://play.google.com/store/apps/details?id=dk.mvainformatics.android.babymonitor)
-
-# Translating
-
-If you are interested in translating this application to another language, find the project listing on [Transifex](https://www.transifex.com/na-243/protect-baby-monitor/).
+At the time this project was forked from _Protect Baby Monitor_ there was no obvious open source solution for a
+baby monitor for Android in F-Droid.
 
 # Thanks
 
@@ -37,6 +27,3 @@ App icon originals from [Icons4Android](http://www.icons4android.com/)
 and formatted using [Android Asset Studio](https://romannurik.github.io/AndroidAssetStudio/index.html).
 
 Audio file originals from [freesound](https://freesound.org).
-
-# Note from Developer
-The developer is currently on hiatus from the project. Questions and pull requests may not be looked at for some time. Apologies in advance.

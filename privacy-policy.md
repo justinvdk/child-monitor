@@ -1,7 +1,7 @@
-# PRIVACY POLICY FOR PROTECT BABY MONITOR
+# PRIVACY POLICY FOR CHILD MONITOR
 
-This privacy policy governs your use of the software application Protect Baby Monitor (“Application”) for mobile devices
-that was created by Protect. The Application is a simple WiFi based baby monitor.
+This privacy policy governs your use of the software application Child Monitor (“Application”) for mobile devices.
+The Application is a simple network based baby monitor.
 
 # What information does the Application obtain and how is it used?
 
@@ -52,22 +52,25 @@ not delete such emails.
 
 This Application is not used to knowingly solicit data from or market to children under the age of 13. If a parent or
 guardian becomes aware that his or her child has provided us with information without their consent, he or she should
-contact us at protect.github@gmail.com. We will delete such information from our files within a reasonable time.
+contact me at github@rochefort.de. I will delete such information from my files within a reasonable time.
 
 # Security
 
-We are concerned about safeguarding the confidentiality of your information. The only information which could
+I am concerned about safeguarding the confidentiality of your information. The only information which could
 be sent to the developer is crash details, and these are opt-in. If a user is presented with the option to
 submit details on a crash, all the information which would be submitted is presented to the user. The only
 personally identifiable information is the email address of the user which is used to send the crash details.
 
+The data transferred between two paired devices is transmitted unencrypted. It is the responsiblity of the user to
+only transfer data through otherwise secured channels.
+
 # Changes
 
-This Privacy Policy may be updated from time to time for any reason. We will notify you of any changes to our
+This Privacy Policy may be updated from time to time for any reason. I will notify you of any changes to this
 Privacy Policy by posting the new Privacy Policy here. You are advised to consult this Privacy Policy regularly
 for any changes, as continued use is deemed approval of all changes. You can check the history of this policy by
 checking this history of this file in GitHub.
 
-# Contact us
+# Contact me
 If you have any questions regarding privacy while using the Application, or have questions about our practices,
-please contact us via email at protect.github@gmail.com.
+please contact me via email at github@rochefort.de.

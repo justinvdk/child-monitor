@@ -1,20 +1,20 @@
 /**
- * This file is part of the Protect Baby Monitor.
+ * This file is part of the Child Monitor.
  *
- * Protect Baby Monitor is free software: you can redistribute it and/or modify
+ * Child Monitor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Protect Baby Monitor is distributed in the hope that it will be useful,
+ * Child Monitor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Protect Baby Monitor. If not, see <http://www.gnu.org/licenses/>.
+ * along with Child Monitor. If not, see <http://www.gnu.org/licenses/>.
  */
-package protect.babymonitor;
+package de.rochefort.childmonitor;
 
 import android.app.Activity;
 import android.content.Context;
@@ -32,9 +32,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+
 public class DiscoverActivity extends Activity
 {
-    final String TAG = "BabyMonitor";
+    final String TAG = "ChildMonitor";
 
     NsdManager _nsdManager;
 
@@ -43,7 +44,7 @@ public class DiscoverActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Log.i(TAG, "Baby monitor start");
+        Log.i(TAG, "ChildMonitor start");
 
         _nsdManager = (NsdManager)this.getSystemService(Context.NSD_SERVICE);
 
@@ -74,7 +75,7 @@ public class DiscoverActivity extends Activity
     private void loadDiscoveryViaMdns()
     {
         setContentView(R.layout.activity_discover_mdns);
-        startServiceDiscovery("_babymonitor._tcp.");
+        startServiceDiscovery("_childmonitor._tcp.");
     }
 
     private void loadDiscoveryViaAddress()
@@ -121,7 +122,7 @@ public class DiscoverActivity extends Activity
     @Override
     protected void onDestroy()
     {
-        Log.i(TAG, "Baby monitoring stop");
+        Log.i(TAG, "ChildMonitoring stop");
 
         if(_discoveryListener != null)
         {
@@ -176,7 +177,7 @@ public class DiscoverActivity extends Activity
                     // transport layer for this service.
                     Log.d(TAG, "Unknown Service Type: " + service.getServiceType());
                 }
-                else if (service.getServiceName().contains("ProtectBabyMonitor"))
+                else if (service.getServiceName().contains("ChildMonitor"))
                 {
                     NsdManager.ResolveListener resolver = new NsdManager.ResolveListener()
                     {
@@ -285,9 +286,9 @@ class ServiceInfoWrapper
     {
         // If there is more than one service on the network, it will
         // have a number at the end, but will appear as the following:
-        //   "ProtectBabyMonitor\\032(number)
+        //   "ChildMonitor\\032(number)
         // or
-        //   "ProtectBabyMonitor\032(number)
+        //   "ChildMonitor\032(number)
         // Replace \\032 and \032 with a " "
         String serviceName = _info.getServiceName();
         serviceName = serviceName.replace("\\\\032", " ");
