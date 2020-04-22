@@ -22,8 +22,4 @@ At the time this project was forked from _Protect Baby Monitor_ there was no obv
 baby monitor for Android in F-Droid.
 
 # Thanks
-
-App icon originals from [Icons4Android](http://www.icons4android.com/)
-and formatted using [Android Asset Studio](https://romannurik.github.io/AndroidAssetStudio/index.html).
-
 Audio file originals from [freesound](https://freesound.org).
