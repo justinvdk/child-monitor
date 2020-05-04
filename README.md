@@ -23,3 +23,4 @@ baby monitor for Android in F-Droid.
 
 # Thanks
 Audio file originals from [freesound](https://freesound.org).
+This whole project originally created by [brarcher](https://github.com/brarcher/protect-baby-monitor).
