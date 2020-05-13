@@ -20,76 +20,98 @@
         android:textSize="25sp" />
 
     <Space
-       android:layout_width="match_parent"
-       android:layout_height="15dip" />
+        android:layout_width="match_parent"
+        android:layout_height="15dip" />
 
-    <TextView
-        android:id="@+id/serviceTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/serviceTitle"
-        android:textSize="20sp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/textService"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/loading"
-        android:textSize="20sp" />
+        <LinearLayout
+            android:id="@+id/LinearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:keepScreenOn="true"
+            tools:context="de.rochefort.childmonitor.MonitorActivity" >
 
-    <TextView
-        android:id="@+id/serviceDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/serviceDescription" />
+            <TextView
+                android:id="@+id/serviceTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/serviceTitle"
+                android:textSize="20sp" />
 
-    <Space
-       android:layout_width="match_parent"
-       android:layout_height="15dip" />
+            <TextView
+                android:id="@+id/textService"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/loading"
+                android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/addressTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/addressTitle"
-        android:textSize="20sp" />
+            <TextView
+                android:id="@+id/serviceDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/serviceDescription" />
 
-    <TextView
-        android:id="@+id/address"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="20sp"/>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="15dip" />
 
-    <TextView
-        android:id="@+id/portTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/portTitle"
-        android:textSize="20sp" />
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="15dip" />
 
-    <TextView
-        android:id="@+id/port"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/loading"
-        android:textSize="20sp"/>
+            <TextView
+                android:id="@+id/portTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/portTitle"
+                android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/addressDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/addressDescription" />
+            <TextView
+                android:id="@+id/port"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/loading"
+                android:textSize="20sp"/>
 
-    <Space
-       android:layout_width="match_parent"
-       android:layout_height="15dip" />
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="15dip" />
 
-    <TextView
-        android:id="@+id/textStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="20sp" />
+            <TextView
+                android:id="@+id/addressTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/addressTitle"
+                android:textSize="20sp" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="15dip" />
+
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="15sp"/>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="15dip" />
+
+            <TextView
+                android:id="@+id/textStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="20sp" />
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

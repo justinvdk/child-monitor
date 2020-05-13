@@ -20,10 +20,9 @@
     <string name="connectedTo">Connected To:</string>
     <string name="disconnected">Disconnected</string>
     <string name="listening">Listening...</string>
-    <string name="addressTitle">Address:</string>
+    <string name="addressTitle">Addresses:</string>
     <string name="portTitle">Port:</string>
-    <string name="addressDescription">Address and port that parent must pair to</string>
-    <string name="wifiNotConnected">Not connected to a Wi-Fi network</string>
+    <string name="notConnected">Not connected to any network</string>
     <string name="enterAddressInstructions">Enter the IP Address and port of a child and click Connect</string>
     <string name="connect">Connect</string>
     <string name="exampleAddress">192.168.1.2</string>

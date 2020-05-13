@@ -20,10 +20,9 @@
     <string name="connectedTo">Verbunden mit:</string>
     <string name="disconnected">Getrennt</string>
     <string name="listening">Lausche...</string>
-    <string name="addressTitle">Adresse:</string>
+    <string name="addressTitle">Adressen:</string>
     <string name="portTitle">Port:</string>
-    <string name="addressDescription">Adresse und Port zum Koppeln mit Eltern</string>
-    <string name="wifiNotConnected">Nicht mit WLAN-Netzwerk verbunden</string>
+    <string name="notConnected">Mit keinem Netzwerk verbunden</string>
     <string name="enterAddressInstructions">Gib die IP-Adresse und den Port des Kind-Gerätes ein und klicke auf Verbinden</string>
     <string name="connect">Verbinden</string>
     <string name="exampleAddress">192.168.1.2</string>

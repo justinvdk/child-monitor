@@ -18,20 +18,24 @@ package de.rochefort.childmonitor;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.net.ConnectivityManager;
+import android.net.LinkAddress;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.text.format.Formatter;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -138,21 +142,45 @@ public class MonitorActivity extends Activity {
             }
         }).start();
 
-        final TextView addressText = (TextView) findViewById(R.id.address);
+        final TextView addressText = findViewById(R.id.address);
 
-        // Use the application context to get WifiManager, to avoid leak before Android 5.1
-        final WifiManager wifiManager =
-                (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        final WifiInfo info = wifiManager.getConnectionInfo();
-        final int address = info.getIpAddress();
-        if(address != 0) {
-            @SuppressWarnings("deprecation")
-            final String ipAddress = Formatter.formatIpAddress(address);
-            addressText.setText(ipAddress);
+        List<String> listenAddresses = getListenAddresses();
+        if(!listenAddresses.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < listenAddresses.size(); i++) {
+                String listenAddress = listenAddresses.get(i);
+                sb.append(listenAddress);
+                if (i != listenAddresses.size() -1) {
+                    sb.append("\n\n");
+                }
+            }
+            addressText.setText(sb.toString());
         } else {
-            addressText.setText(R.string.wifiNotConnected);
+            addressText.setText(R.string.notConnected);
         }
 
+    }
+
+    private List<String> getListenAddresses() {
+        String service = Context.CONNECTIVITY_SERVICE;
+        ConnectivityManager cm = (ConnectivityManager)getSystemService(service);
+        List<String> listenAddresses = new ArrayList<>();
+        if (cm != null) {
+            for (Network network : cm.getAllNetworks()) {
+                NetworkInfo networkInfo = cm.getNetworkInfo(network);
+                boolean connected = networkInfo.isConnected();
+                if (connected) {
+                    List<LinkAddress> linkAddresses = cm.getLinkProperties(network).getLinkAddresses();
+                    for (LinkAddress linkAddress : linkAddresses) {
+                        InetAddress address = linkAddress.getAddress();
+                        if (!address.isLinkLocalAddress() && !address.isLoopbackAddress()) {
+                            listenAddresses.add(address.getHostAddress() + " (" + networkInfo.getTypeName() + ")");
+                        }
+                    }
+                }
+            }
+        }
+        return listenAddresses;
     }
 
     @Override

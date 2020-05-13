@@ -22,8 +22,7 @@
     <string name="listening">リスニング中...</string>
     <string name="addressTitle">アドレス:</string>
     <string name="portTitle">ポート:</string>
-    <string name="addressDescription">親機がペアにする先のアドレスとポート</string>
-    <string name="wifiNotConnected">Wi-Fi ネットワークに接続されていません</string>
+    <string name="notConnected">ネットワークに接続されていません</string>
     <string name="enterAddressInstructions">子機の IP アドレスとポートを入力して、接続をクリックしてください</string>
     <string name="connect">接続</string>
     <string name="exampleAddress">192.168.1.2</string>

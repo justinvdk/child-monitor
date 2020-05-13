@@ -8,7 +8,7 @@ device and receive an audio stream.
 
 The project is a fork of _Protect Baby Monitor_ which is declared as "on hiatus" by its developer.
 
-_Child Monitor_ works on Android 4.4 (KitKat) and newer, i.e. Android SDK 19.
+_Child Monitor_ works on Android 5.0 (Lollipop) and newer, i.e. Android SDK 21.
 
 The current version of _Child Monitor_ is rudimentary at best. It is capable
 of successfully advertising itself on the network, allows clients to connect,

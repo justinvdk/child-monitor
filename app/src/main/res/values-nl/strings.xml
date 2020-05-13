@@ -20,10 +20,9 @@
     <string name="connectedTo">Verbonden met:</string>
     <string name="disconnected">Verbinding verbroken</string>
     <string name="listening">Bezig met luisteren...</string>
-    <string name="addressTitle">Adres:</string>
+    <string name="addressTitle">Adressen:</string>
     <string name="portTitle">Poort:</string>
-    <string name="addressDescription">Adres en poort waar de ouder mee moet verbinden</string>
-    <string name="wifiNotConnected">Niet verbonden met een Wi-Fi-netwerk</string>
+    <string name="notConnected">Niet verbonden met een netwerk</string>
     <string name="enterAddressInstructions">Voer het IP-adres en de poort van een kindapparaat in en druk op Verbinden</string>
     <string name="connect">Verbinden</string>
     <string name="exampleAddress">192.168.1.2</string>

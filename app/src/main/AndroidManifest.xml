@@ -4,6 +4,7 @@
     android:versionCode="2"
     android:versionName="0.2" >
 
+    <uses-permission android:required="true" android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:required="true" android:name="android.permission.INTERNET"/>
     <uses-permission android:required="true" android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:required="true" android:name="android.permission.ACCESS_WIFI_STATE"/>
