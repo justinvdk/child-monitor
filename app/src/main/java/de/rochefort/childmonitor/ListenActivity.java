@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the Child Monitor.
  *
  * Child Monitor is free software: you can redistribute it and/or modify

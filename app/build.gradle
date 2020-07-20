@@ -10,7 +10,7 @@ android {
     compileSdkVersion 26
 
     defaultConfig {
-        applicationId "child.monitor"
+        applicationId "de.rochefort.childmonitor"
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 4
