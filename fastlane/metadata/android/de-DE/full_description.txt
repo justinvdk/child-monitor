@@ -1,0 +1,9 @@
+<p>Ein quelloffenes Babyfon f&uuml;r Android</p>
+
+<p>Child Monitor l&auml;sst zwei Androidger&auml;te als Babyfon fungieren. Das erste Ger&auml;t bleibt im Kinderzimmer. Das zweite Ger&auml;t kann sich &uuml;ber das Netzwerk mit ihm verbinden und einen Audiostream empfangen.</p>
+
+<p>Dieses Projekt ist ein Fork von Protect Baby Monitor, welches von seinem Entwickler als "on hiatus" (pausiert) gekennzeichnet wurde.</p>
+
+<p>Child Monitor funktioniert auf Android 5.0 (Lollipop) und neuer, d.h. ab Android SDK 21.</p>
+
+<p>Die aktuelle Version von Child Monitor ist bestenfalls rudiment&auml;r. Es ist in der Lage, sich im Netzwerk bekannt zu machen, Clientverbindungen anzunehmen und Audio zu streamen.</p>
