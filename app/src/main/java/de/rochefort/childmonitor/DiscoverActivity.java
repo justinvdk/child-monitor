@@ -19,6 +19,7 @@ package de.rochefort.childmonitor;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiManager;
@@ -36,6 +37,8 @@ import android.widget.Toast;
 
 public class DiscoverActivity extends Activity
 {
+    private static final String PREF_KEY_CHILD_DEVICE_ADDRESS = "childDeviceAddress";
+    private static final String PREF_KEY_CHILD_DEVICE_PORT = "childDevicePort";
     final String TAG = "ChildMonitor";
 
     NsdManager _nsdManager;
@@ -84,16 +87,23 @@ public class DiscoverActivity extends Activity
         setContentView(R.layout.activity_discover_address);
 
         final Button connectButton = (Button) findViewById(R.id.connectViaAddressButton);
+        final EditText addressField = (EditText) findViewById(R.id.ipAddressField);
+        final EditText portField = (EditText) findViewById(R.id.portField);
+        String preferredAddress = getPreferences(MODE_PRIVATE).getString(PREF_KEY_CHILD_DEVICE_ADDRESS, null);
+        if (preferredAddress != null && !preferredAddress.isEmpty()) {
+            addressField.setText(preferredAddress);
+        }
+        int preferredPort = getPreferences(MODE_PRIVATE).getInt(PREF_KEY_CHILD_DEVICE_PORT, -1);
+        if (preferredPort > 0) {
+            portField.setText(String.valueOf(preferredPort));
+        }
+
         connectButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 Log.i(TAG, "Connecting to child device via address");
-
-                final EditText addressField = (EditText) findViewById(R.id.ipAddressField);
-                final EditText portField = (EditText) findViewById(R.id.portField);
-
                 final String addressString = addressField.getText().toString();
                 final String portString = portField.getText().toString();
 
@@ -114,7 +124,10 @@ public class DiscoverActivity extends Activity
                     Toast.makeText(DiscoverActivity.this, R.string.invalidPort, Toast.LENGTH_LONG).show();
                     return;
                 }
-
+                SharedPreferences.Editor preferencesEditor = getPreferences(MODE_PRIVATE).edit();
+                preferencesEditor.putString(PREF_KEY_CHILD_DEVICE_ADDRESS, addressString);
+                preferencesEditor.putInt(PREF_KEY_CHILD_DEVICE_PORT, port);
+                preferencesEditor.apply();
                 connectToChild(addressString, port, addressString);
             }
         });
