@@ -31,6 +31,7 @@ public class StartActivity extends Activity
 {
     static final String TAG = "ChildMonitor";
     private final static int PERMISSIONS_REQUEST_RECORD_AUDIO = 298349824;
+    private final static int PERMISSIONS_REQUEST_MULTICAST = 298349825;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +63,19 @@ public class StartActivity extends Activity
             public void onClick(View v)
             {
                 Log.i(TAG, "Starting connection activity");
-                Intent i = new Intent(getApplicationContext(), DiscoverActivity.class);
-                startActivity(i);
+                if (isMulticastPermissionGranted()) {
+                    Intent i = new Intent(getApplicationContext(), DiscoverActivity.class);
+                    startActivity(i);
+                } else {
+                    requestMulticastPermission();
+                }
             }
         });
+    }
+
+    private boolean isMulticastPermissionGranted() {
+        return ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.CHANGE_WIFI_MULTICAST_STATE)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     private boolean isAudioRecordingPermissionGranted() {
@@ -79,11 +89,20 @@ public class StartActivity extends Activity
                 PERMISSIONS_REQUEST_RECORD_AUDIO);
     }
 
+    private void requestMulticastPermission() {
+        ActivityCompat.requestPermissions(StartActivity.this,
+                new String[]{Manifest.permission.CHANGE_WIFI_MULTICAST_STATE},
+                PERMISSIONS_REQUEST_MULTICAST);
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO && grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startActivity(new Intent(getApplicationContext(), MonitorActivity.class));
+        } else if (requestCode == PERMISSIONS_REQUEST_MULTICAST) {
+            // its okay if the permission was denied... the user will have to type the address manually
+            startActivity(new Intent(getApplicationContext(), DiscoverActivity.class));
         }
     }
 }

@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -138,6 +139,31 @@ public class DiscoverActivity extends Activity
     public void startServiceDiscovery(final String serviceType)
     {
         final NsdManager nsdManager = (NsdManager)this.getSystemService(Context.NSD_SERVICE);
+        if (nsdManager == null) {
+            Log.e(TAG, "Could not obtain nsdManager");
+            return;
+        }
+
+        WifiManager wifi = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        final Runnable multicastReleaser;
+        if (wifi != null) {
+            final WifiManager.MulticastLock multicastLock = wifi.createMulticastLock("multicastLock");
+            multicastLock.setReferenceCounted(true);
+            multicastLock.acquire();
+            multicastReleaser = new Runnable() {
+                @Override
+                public void run() {
+                    multicastLock.release();
+                }
+            };
+        } else {
+            multicastReleaser = new Runnable() {
+                @Override
+                public void run() {
+                }
+            };
+        }
+
 
         final ListView serviceTable = (ListView) findViewById(R.id.ServiceTable);
 
@@ -218,12 +244,14 @@ public class DiscoverActivity extends Activity
                 // When the network service is no longer available.
                 // Internal bookkeeping code goes here.
                 Log.e(TAG, "Service lost: " + service);
+                multicastReleaser.run();
             }
 
             @Override
             public void onDiscoveryStopped(String serviceType)
             {
                 Log.i(TAG, "Discovery stopped: " + serviceType);
+                multicastReleaser.run();
             }
 
             @Override
@@ -231,6 +259,7 @@ public class DiscoverActivity extends Activity
             {
                 Log.e(TAG, "Discovery failed: Error code: " + errorCode);
                 nsdManager.stopServiceDiscovery(this);
+                multicastReleaser.run();
             }
 
             @Override
@@ -238,6 +267,7 @@ public class DiscoverActivity extends Activity
             {
                 Log.e(TAG, "Discovery failed: Error code: " + errorCode);
                 nsdManager.stopServiceDiscovery(this);
+                multicastReleaser.run();
             }
         };
 
