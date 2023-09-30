@@ -17,5 +17,5 @@
 package de.rochefort.childmonitor;
 
 public interface AudioListener {
-    void onAudio(byte[] audioBytes);
+    void onAudio(short[] audioBytes);
 }

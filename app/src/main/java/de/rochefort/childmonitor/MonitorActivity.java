@@ -16,6 +16,8 @@
  */
 package de.rochefort.childmonitor;
 
+import static de.rochefort.childmonitor.AudioCodecDefines.CODEC;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -53,13 +55,9 @@ public class MonitorActivity extends Activity {
     private int currentPort;
 
     private void serviceConnection(Socket socket) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run()
-                {
-                    final TextView statusText = (TextView) findViewById(R.id.textStatus);
-                    statusText.setText(R.string.streaming);
-                }
+            runOnUiThread(() -> {
+                final TextView statusText = (TextView) findViewById(R.id.textStatus);
+                statusText.setText(R.string.streaming);
             });
 
             final int frequency = AudioCodecDefines.FREQUENCY;
@@ -75,21 +73,24 @@ public class MonitorActivity extends Activity {
                     bufferSize
             );
 
-            final int byteBufferSize = bufferSize*2;
-            final byte[] buffer = new byte[byteBufferSize];
+            final int pcmBufferSize = bufferSize*2;
+            final short[] pcmBuffer = new short[pcmBufferSize];
+            final byte[] ulawBuffer = new byte[pcmBufferSize];
 
             try {
                 audioRecord.startRecording();
                 final OutputStream out = socket.getOutputStream();
 
-                socket.setSendBufferSize(byteBufferSize);
+                socket.setSendBufferSize(pcmBufferSize);
                 Log.d(TAG, "Socket send buffer size: " + socket.getSendBufferSize());
 
                 while (socket.isConnected() && !Thread.currentThread().isInterrupted()) {
-                    final int read = audioRecord.read(buffer, 0, bufferSize);
-                    out.write(buffer, 0, read);
+                    final int read = audioRecord.read(pcmBuffer, 0, bufferSize);
+                    int encoded = CODEC.encode(pcmBuffer, read, ulawBuffer, 0);
+                    out.write(ulawBuffer, 0, encoded);
+
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "Connection failed", e);
             } finally {
                 audioRecord.stop();
@@ -109,35 +110,31 @@ public class MonitorActivity extends Activity {
         final Object currentToken = new Object();
         connectionToken = currentToken;
 
-        new Thread(new Runnable() {
-            @Override
-            public void run()
-            {
-                while(Objects.equals(connectionToken, currentToken)) {
-                    try (ServerSocket serverSocket = new ServerSocket(currentPort)) {
-                        currentSocket = serverSocket;
-                        // Store the chosen port.
-                        final int localPort = serverSocket.getLocalPort();
+        new Thread(() -> {
+            while(Objects.equals(connectionToken, currentToken)) {
+                try (ServerSocket serverSocket = new ServerSocket(currentPort)) {
+                    currentSocket = serverSocket;
+                    // Store the chosen port.
+                    final int localPort = serverSocket.getLocalPort();
 
-                        // Register the service so that parent devices can
-                        // locate the child device
-                        registerService(localPort);
+                    // Register the service so that parent devices can
+                    // locate the child device
+                    registerService(localPort);
 
-                        // Wait for a parent to find us and connect
-                        try (Socket socket = serverSocket.accept()) {
-                            Log.i(TAG, "Connection from parent device received");
+                    // Wait for a parent to find us and connect
+                    try (Socket socket = serverSocket.accept()) {
+                        Log.i(TAG, "Connection from parent device received");
 
-                            // We now have a client connection.
-                            // Unregister so no other clients will
-                            // attempt to connect
-                            unregisterService();
-                            serviceConnection(socket);
-                        }
-                    } catch(IOException e) {
-                        // Just in case
-                        currentPort++;
-                        Log.e(TAG, "Failed to open server socket. Port increased to " + currentPort, e);
+                        // We now have a client connection.
+                        // Unregister so no other clients will
+                        // attempt to connect
+                        unregisterService();
+                        serviceConnection(socket);
                     }
+                } catch(Exception e) {
+                    // Just in case
+                    currentPort++;
+                    Log.e(TAG, "Failed to open server socket. Port increased to " + currentPort, e);
                 }
             }
         }).start();

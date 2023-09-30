@@ -21,6 +21,9 @@ and streams audio. Room for improvement includes:
 At the time this project was forked from _Protect Baby Monitor_ there was no obvious open source solution for a
 baby monitor for Android in F-Droid.
 
+# License information
+_Child Monitor_ is licensed under the GPLv3. The Ulaw encoding / decoding code is licensed under the Apache License, Version 2.0 and taken from the Android Open Source Project.
+
 # Thanks
 Audio file originals from [freesound](https://freesound.org).
 This whole project originally created by [brarcher](https://github.com/brarcher/protect-baby-monitor).

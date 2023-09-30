@@ -56,7 +56,7 @@ public class VolumeView extends View {
         paint.setColor(Color.rgb(255, 127, 0));
     }
 
-    public void onAudioData(byte[] data) {
+    public void onAudioData(short[] data) {
         double sum = 0;
         for (int i = 0; i < data.length; i++) {
             double rel = data[i] / ((double)128);
@@ -94,7 +94,7 @@ public class VolumeView extends View {
         double margins = height * 0.1;
         double graphHeight = height - 2*margins;
         int leftMost = Math.max(0, volumeHistory.size() - width);
-        int yPrev = (int) (graphHeight - margins);
+        int yPrev = (int) (height - margins);
         for (int i = leftMost; i < volumeHistory.size() && i - leftMost < width; i++) {
             int xNext = i - leftMost;
             int yNext = (int) (margins + graphHeight - volumeHistory.get(i) / maxVolume * (graphHeight));

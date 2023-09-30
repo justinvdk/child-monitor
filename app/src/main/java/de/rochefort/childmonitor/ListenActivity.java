@@ -16,6 +16,8 @@
  */
 package de.rochefort.childmonitor;
 
+import static de.rochefort.childmonitor.AudioCodecDefines.CODEC;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -30,6 +32,8 @@ import android.util.Log;
 import android.widget.TextView;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+
+import de.rochefort.childmonitor.audio.G711UCodec;
 
 public class ListenActivity extends Activity
 {
@@ -69,20 +73,25 @@ public class ListenActivity extends Activity
 
         try
         {
-            final byte [] buffer = new byte[byteBufferSize];
+            final byte [] readBuffer = new byte[byteBufferSize];
+            final short [] decodedBuffer = new short[byteBufferSize*2];
 
             while(socket.isConnected() && read != -1 && Thread.currentThread().isInterrupted() == false)
             {
-                read = is.read(buffer);
+                read = is.read(readBuffer);
+                int decoded = CODEC.decode(decodedBuffer, readBuffer, read, 0);
 
-                if(read > 0)
+                if(decoded > 0)
                 {
-                    audioTrack.write(buffer, 0, read);
-                    byte[] readBytes = new byte[read];
-                    System.arraycopy(buffer, 0, readBytes, 0, read);
-                    listener.onAudio(readBytes);
+                    audioTrack.write(decodedBuffer, 0, decoded);
+                    short[] decodedBytes = new short[decoded];
+                    System.arraycopy(decodedBuffer, 0, decodedBytes, 0, decoded);
+                    listener.onAudio(decodedBytes);
                 }
             }
+        }
+        catch (Exception e) {
+            Log.e(TAG, "Connection failed", e);
         }
         finally
         {
@@ -125,7 +134,7 @@ public class ListenActivity extends Activity
 
         final AudioListener listener = new AudioListener() {
             @Override
-            public void onAudio(final byte[] audioData) {
+            public void onAudio(final short[] audioData) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
