@@ -84,7 +84,7 @@ public class MonitorActivity extends Activity {
                 socket.setSendBufferSize(pcmBufferSize);
                 Log.d(TAG, "Socket send buffer size: " + socket.getSendBufferSize());
 
-                while (socket.isConnected() && !Thread.currentThread().isInterrupted()) {
+                while (socket.isConnected() && currentSocket != null && !Thread.currentThread().isInterrupted()) {
                     final int read = audioRecord.read(pcmBuffer, 0, bufferSize);
                     int encoded = CODEC.encode(pcmBuffer, read, ulawBuffer, 0);
                     out.write(ulawBuffer, 0, encoded);
@@ -181,7 +181,7 @@ public class MonitorActivity extends Activity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStop() {
         Log.i(TAG, "ChildMonitor stop");
 
         unregisterService();
@@ -190,12 +190,12 @@ public class MonitorActivity extends Activity {
         if(currentSocket != null) {
             try {
                 currentSocket.close();
+                currentSocket = null;
             } catch (IOException e) {
                 Log.e(TAG, "Failed to close active socket on port "+currentPort);
             }
         }
-
-        super.onDestroy();
+        super.onStop();
     }
 
     private void registerService(final int port) {
