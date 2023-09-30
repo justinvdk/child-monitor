@@ -16,14 +16,11 @@ can be run by gradle using:
 
     # ./gradlew testReleaseUnitTest
 
-The second and third check for common problems using static analysis.
-These are the Android lint checker, run using:
+The second check for common problems uses static analysis.
+This is the Android lint checker, run using:
 
     # ./gradlew lintRelease
 
-and FindBugs, run using:
-
-    # ./gradlew findbugs
 
 The final check is by testing the application on a live device and verifying
 the basic functionality works as expected.
