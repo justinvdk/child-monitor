@@ -18,22 +18,20 @@ package de.rochefort.childmonitor;
 
 import static de.rochefort.childmonitor.AudioCodecDefines.CODEC;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
 import android.app.Activity;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.TextView;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
+import android.widget.TextView;
 
-import de.rochefort.childmonitor.audio.G711UCodec;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class ListenActivity extends Activity
 {

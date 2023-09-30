@@ -18,15 +18,6 @@ package de.rochefort.childmonitor;
 
 import static de.rochefort.childmonitor.AudioCodecDefines.CODEC;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioRecord;
@@ -40,6 +31,15 @@ import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class MonitorActivity extends Activity {
     final static String TAG = "ChildMonitor";
