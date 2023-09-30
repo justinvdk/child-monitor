@@ -27,8 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-public class StartActivity extends Activity
-{
+public class StartActivity extends Activity {
     static final String TAG = "ChildMonitor";
     private final static int PERMISSIONS_REQUEST_RECORD_AUDIO = 298349824;
     private final static int PERMISSIONS_REQUEST_MULTICAST = 298349825;
@@ -41,34 +40,24 @@ public class StartActivity extends Activity
         setContentView(R.layout.activity_start);
 
         final Button monitorButton = (Button) findViewById(R.id.useChildDevice);
-        monitorButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Log.i(TAG, "Starting up monitor");
+        monitorButton.setOnClickListener(v -> {
+            Log.i(TAG, "Starting up monitor");
 
-                if (isAudioRecordingPermissionGranted()) {
-                    startActivity(new Intent(getApplicationContext(), MonitorActivity.class));
-                } else {
-                    requestAudioPermission();
-                }
+            if (isAudioRecordingPermissionGranted()) {
+                startActivity(new Intent(getApplicationContext(), MonitorActivity.class));
+            } else {
+                requestAudioPermission();
             }
         });
 
         final Button connectButton = (Button) findViewById(R.id.useParentDevice);
-        connectButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Log.i(TAG, "Starting connection activity");
-                if (isMulticastPermissionGranted()) {
-                    Intent i = new Intent(getApplicationContext(), DiscoverActivity.class);
-                    startActivity(i);
-                } else {
-                    requestMulticastPermission();
-                }
+        connectButton.setOnClickListener(v -> {
+            Log.i(TAG, "Starting connection activity");
+            if (isMulticastPermissionGranted()) {
+                Intent i = new Intent(getApplicationContext(), DiscoverActivity.class);
+                startActivity(i);
+            } else {
+                requestMulticastPermission();
             }
         });
     }

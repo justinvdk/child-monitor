@@ -33,8 +33,7 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class ListenActivity extends Activity
-{
+public class ListenActivity extends Activity {
     final String TAG = "ChildMonitor";
     // Sets an ID for the notification
     final static int mNotificationId = 1;
@@ -51,8 +50,7 @@ public class ListenActivity extends Activity
     private final int bufferSize = AudioTrack.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
     private final int byteBufferSize = bufferSize*2;
 
-    private void streamAudio(final Socket socket, AudioListener listener) throws IllegalArgumentException, IllegalStateException, IOException
-    {
+    private void streamAudio(final Socket socket, AudioListener listener) throws IllegalArgumentException, IllegalStateException, IOException {
         Log.i(TAG, "Setting up stream");
 
         final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
@@ -69,38 +67,31 @@ public class ListenActivity extends Activity
 
         audioTrack.play();
 
-        try
-        {
+        try {
             final byte [] readBuffer = new byte[byteBufferSize];
             final short [] decodedBuffer = new short[byteBufferSize*2];
 
-            while(socket.isConnected() && read != -1 && Thread.currentThread().isInterrupted() == false)
-            {
+            while(socket.isConnected() && read != -1 && !Thread.currentThread().isInterrupted()) {
                 read = is.read(readBuffer);
                 int decoded = CODEC.decode(decodedBuffer, readBuffer, read, 0);
 
-                if(decoded > 0)
-                {
+                if(decoded > 0) {
                     audioTrack.write(decodedBuffer, 0, decoded);
                     short[] decodedBytes = new short[decoded];
                     System.arraycopy(decodedBuffer, 0, decodedBytes, 0, decoded);
                     listener.onAudio(decodedBytes);
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e(TAG, "Connection failed", e);
-        }
-        finally
-        {
+        } finally {
             audioTrack.stop();
             socket.close();
         }
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         final Bundle b = getIntent().getExtras();
@@ -130,66 +121,38 @@ public class ListenActivity extends Activity
 
         final VolumeView volumeView = (VolumeView) findViewById(R.id.volume);
 
-        final AudioListener listener = new AudioListener() {
-            @Override
-            public void onAudio(final short[] audioData) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        volumeView.onAudioData(audioData);
-                    }
-                });
+        final AudioListener listener = audioData -> runOnUiThread(() -> volumeView.onAudioData(audioData));
+
+
+        _listenThread = new Thread(() -> {
+            try {
+                final Socket socket = new Socket(_address, _port);
+                streamAudio(socket, listener);
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to stream audio", e);
             }
-        };
 
+            if(!Thread.currentThread().isInterrupted()) {
+                // If this thread has not been interrupted, likely something
+                // bad happened with the connection to the child device. Play
+                // an alert to notify the user that the connection has been
+                // interrupted.
+                playAlert();
 
-        _listenThread = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    final Socket socket = new Socket(_address, _port);
-                    streamAudio(socket, listener);
-                }
-                catch (UnknownHostException e)
-                {
-                    Log.e(TAG, "Failed to stream audio", e);
-                }
-                catch (IOException e)
-                {
-                    Log.e(TAG, "Failed to stream audio", e);
-                }
+                ListenActivity.this.runOnUiThread(() -> {
+                    final TextView connectedText1 = (TextView) findViewById(R.id.connectedTo);
+                    connectedText1.setText("");
 
-                if(Thread.currentThread().isInterrupted() == false)
-                {
-                    // If this thread has not been interrupted, likely something
-                    // bad happened with the connection to the child device. Play
-                    // an alert to notify the user that the connection has been
-                    // interrupted.
-                    playAlert();
-
-                    ListenActivity.this.runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            final TextView connectedText = (TextView) findViewById(R.id.connectedTo);
-                            connectedText.setText("");
-
-                            final TextView statusText = (TextView) findViewById(R.id.textStatus);
-                            statusText.setText(R.string.disconnected);
-                            NotificationCompat.Builder mBuilder =
-                                    new NotificationCompat.Builder(ListenActivity.this)
-                                            .setOngoing(false)
-                                            .setSmallIcon(R.drawable.listening_notification)
-                                            .setContentTitle(getString(R.string.app_name))
-                                            .setContentText(getString(R.string.disconnected));
-                            _mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                        }
-                    });
-                }
+                    final TextView statusText1 = (TextView) findViewById(R.id.textStatus);
+                    statusText1.setText(R.string.disconnected);
+                    NotificationCompat.Builder mBuilder1 =
+                            new NotificationCompat.Builder(ListenActivity.this)
+                                    .setOngoing(false)
+                                    .setSmallIcon(R.drawable.listening_notification)
+                                    .setContentTitle(getString(R.string.app_name))
+                                    .setContentText(getString(R.string.disconnected));
+                    _mNotifyMgr.notify(mNotificationId, mBuilder1.build());
+                });
             }
         });
 
@@ -197,32 +160,24 @@ public class ListenActivity extends Activity
     }
 
     @Override
-    public void onDestroy()
-    {
+    protected void onStop() {
         _listenThread.interrupt();
         _listenThread = null;
+        super.onStop();
+    }
 
+    @Override
+    public void onDestroy() {
         super.onDestroy();
     }
 
-    private void playAlert()
-    {
+    private void playAlert() {
         final MediaPlayer mp = MediaPlayer.create(this, R.raw.upward_beep_chromatic_fifths);
-        if(mp != null)
-        {
+        if(mp != null) {
             Log.i(TAG, "Playing alert");
-            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-            {
-                @Override
-                public void onCompletion(MediaPlayer mp)
-                {
-                    mp.release();
-                }
-            });
+            mp.setOnCompletionListener(mp1 -> mp1.release());
             mp.start();
-        }
-        else
-        {
+        } else {
             Log.e(TAG, "Failed to play alert");
         }
     }
