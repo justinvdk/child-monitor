@@ -25,9 +25,6 @@ import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,23 +37,23 @@ public class DiscoverActivity extends Activity {
     private static final String PREF_KEY_CHILD_DEVICE_PORT = "childDevicePort";
     final String TAG = "ChildMonitor";
 
-    NsdManager _nsdManager;
+    private NsdManager nsdManager;
 
-    NsdManager.DiscoveryListener _discoveryListener;
+    private NsdManager.DiscoveryListener discoveryListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "ChildMonitor start");
 
-        _nsdManager = (NsdManager)this.getSystemService(Context.NSD_SERVICE);
+        nsdManager = (NsdManager)this.getSystemService(Context.NSD_SERVICE);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discover);
 
-        final Button discoverChildButton = (Button) findViewById(R.id.discoverChildButton);
+        final Button discoverChildButton = findViewById(R.id.discoverChildButton);
         discoverChildButton.setOnClickListener(v -> loadDiscoveryViaMdns());
 
-        final Button enterChildAddressButton = (Button) findViewById(R.id.enterChildAddressButton);
+        final Button enterChildAddressButton = findViewById(R.id.enterChildAddressButton);
         enterChildAddressButton.setOnClickListener(v -> loadDiscoveryViaAddress());
     }
 
@@ -68,9 +65,9 @@ public class DiscoverActivity extends Activity {
     private void loadDiscoveryViaAddress() {
         setContentView(R.layout.activity_discover_address);
 
-        final Button connectButton = (Button) findViewById(R.id.connectViaAddressButton);
-        final EditText addressField = (EditText) findViewById(R.id.ipAddressField);
-        final EditText portField = (EditText) findViewById(R.id.portField);
+        final Button connectButton = findViewById(R.id.connectViaAddressButton);
+        final EditText addressField = findViewById(R.id.ipAddressField);
+        final EditText portField = findViewById(R.id.portField);
         String preferredAddress = getPreferences(MODE_PRIVATE).getString(PREF_KEY_CHILD_DEVICE_ADDRESS, null);
         if (preferredAddress != null && !preferredAddress.isEmpty()) {
             addressField.setText(preferredAddress);
@@ -93,10 +90,9 @@ public class DiscoverActivity extends Activity {
                 return;
             }
 
-            int port = 0;
+            int port;
 
-            try
-            {
+            try {
                 port = Integer.parseInt(portString);
             }
             catch(NumberFormatException e)
@@ -116,11 +112,11 @@ public class DiscoverActivity extends Activity {
     protected void onDestroy() {
         Log.i(TAG, "ChildMonitoring stop");
 
-        if(_discoveryListener != null) {
+        if(discoveryListener != null) {
             Log.i(TAG, "Unregistering monitoring service");
 
-            _nsdManager.stopServiceDiscovery(_discoveryListener);
-            _discoveryListener = null;
+            nsdManager.stopServiceDiscovery(discoveryListener);
+            discoveryListener = null;
         }
 
         super.onDestroy();
@@ -152,9 +148,9 @@ public class DiscoverActivity extends Activity {
         }
 
 
-        final ListView serviceTable = (ListView) findViewById(R.id.ServiceTable);
+        final ListView serviceTable = findViewById(R.id.ServiceTable);
 
-        final ArrayAdapter<ServiceInfoWrapper> availableServicesAdapter = new ArrayAdapter<ServiceInfoWrapper>(this,
+        final ArrayAdapter<ServiceInfoWrapper> availableServicesAdapter = new ArrayAdapter<>(this,
                 R.layout.available_children_list);
         serviceTable.setAdapter(availableServicesAdapter);
 
@@ -164,7 +160,7 @@ public class DiscoverActivity extends Activity {
         });
 
         // Instantiate a new DiscoveryListener
-        _discoveryListener = new NsdManager.DiscoveryListener() {
+        discoveryListener = new NsdManager.DiscoveryListener() {
             //  Called as soon as service discovery begins.
             @Override
             public void onDiscoveryStarted(String regType)
@@ -197,7 +193,7 @@ public class DiscoverActivity extends Activity {
                         }
                     };
 
-                    _nsdManager.resolveService(service, resolver);
+                    DiscoverActivity.this.nsdManager.resolveService(service, resolver);
                 } else {
                     Log.d(TAG, "Unknown Service name: " + service.getServiceName());
                 }
@@ -233,17 +229,10 @@ public class DiscoverActivity extends Activity {
         };
 
         nsdManager.discoverServices(
-                serviceType, NsdManager.PROTOCOL_DNS_SD, _discoveryListener
+                serviceType, NsdManager.PROTOCOL_DNS_SD, discoveryListener
         );
     }
 
-    /**
-     * Launch the ListenActivity to connect to the given child device
-     *
-     * @param address
-     * @param port
-     * @param name
-     */
     private void connectToChild(final String address, final int port, final String name) {
         final Intent i = new Intent(getApplicationContext(), ListenActivity.class);
         final Bundle b = new Bundle();
@@ -256,30 +245,30 @@ public class DiscoverActivity extends Activity {
 }
 
 class ServiceInfoWrapper {
-    private NsdServiceInfo _info;
+    private final NsdServiceInfo info;
     public ServiceInfoWrapper(NsdServiceInfo info)
     {
-        _info = info;
+        this.info = info;
     }
 
     public String getAddress()
     {
-        return _info.getHost().getHostAddress();
+        return info.getHost().getHostAddress();
     }
 
     public int getPort()
     {
-        return _info.getPort();
+        return info.getPort();
     }
 
     public String getName() {
-        // If there is more than one service on the network, it will
+        // If there is more than one service with the same name on the network, it will
         // have a number at the end, but will appear as the following:
         //   "ChildMonitor\\032(number)
         // or
         //   "ChildMonitor\032(number)
         // Replace \\032 and \032 with a " "
-        String serviceName = _info.getServiceName();
+        String serviceName = info.getServiceName();
         serviceName = serviceName.replace("\\\\032", " ");
         serviceName = serviceName.replace("\\032", " ");
         return serviceName;

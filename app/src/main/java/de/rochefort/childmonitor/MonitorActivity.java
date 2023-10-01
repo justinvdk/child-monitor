@@ -28,6 +28,7 @@ import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -56,7 +57,7 @@ public class MonitorActivity extends Activity {
 
     private void serviceConnection(Socket socket) {
             runOnUiThread(() -> {
-                final TextView statusText = (TextView) findViewById(R.id.textStatus);
+                final TextView statusText = findViewById(R.id.textStatus);
                 statusText.setText(R.string.streaming);
             });
 
@@ -158,8 +159,7 @@ public class MonitorActivity extends Activity {
     }
 
     private List<String> getListenAddresses() {
-        String service = Context.CONNECTIVITY_SERVICE;
-        ConnectivityManager cm = (ConnectivityManager)getSystemService(service);
+        ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         List<String> listenAddresses = new ArrayList<>();
         if (cm != null) {
             for (Network network : cm.getAllNetworks()) {
@@ -199,7 +199,7 @@ public class MonitorActivity extends Activity {
 
     private void registerService(final int port) {
         final NsdServiceInfo serviceInfo  = new NsdServiceInfo();
-        serviceInfo.setServiceName("ChildMonitor");
+        serviceInfo.setServiceName("ChildMonitor on " + Build.MODEL);
         serviceInfo.setServiceType("_childmonitor._tcp.");
         serviceInfo.setPort(port);
 
@@ -213,19 +213,15 @@ public class MonitorActivity extends Activity {
 
                 Log.i(TAG, "Service name: " + serviceName);
 
-                MonitorActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run()
-                    {
-                        final TextView statusText = (TextView) findViewById(R.id.textStatus);
-                        statusText.setText(R.string.waitingForParent);
+                MonitorActivity.this.runOnUiThread(() -> {
+                    final TextView statusText = findViewById(R.id.textStatus);
+                    statusText.setText(R.string.waitingForParent);
 
-                        final TextView serviceText = (TextView) findViewById(R.id.textService);
-                        serviceText.setText(serviceName);
+                    final TextView serviceText = findViewById(R.id.textService);
+                    serviceText.setText(serviceName);
 
-                        final TextView portText = (TextView) findViewById(R.id.port);
-                        portText.setText(Integer.toString(port));
-                    }
+                    final TextView portText = findViewById(R.id.port);
+                    portText.setText(Integer.toString(port));
                 });
             }
 
