@@ -88,7 +88,6 @@ public class MonitorActivity extends Activity {
                     final int read = audioRecord.read(pcmBuffer, 0, bufferSize);
                     int encoded = CODEC.encode(pcmBuffer, read, ulawBuffer, 0);
                     out.write(ulawBuffer, 0, encoded);
-
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Connection failed", e);

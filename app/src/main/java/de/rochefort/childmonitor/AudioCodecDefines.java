@@ -21,7 +21,7 @@ import android.media.AudioFormat;
 import de.rochefort.childmonitor.audio.G711UCodec;
 
 public class AudioCodecDefines {
-    public static final int FREQUENCY = 11025;
+    public static final int FREQUENCY = 8000;
     public static final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     public static final G711UCodec CODEC = new G711UCodec();
     public static final int CHANNEL_CONFIGURATION_IN = AudioFormat.CHANNEL_IN_MONO;
