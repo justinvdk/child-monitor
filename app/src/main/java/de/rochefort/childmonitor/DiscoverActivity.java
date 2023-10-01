@@ -78,6 +78,8 @@ public class DiscoverActivity extends Activity {
         int preferredPort = getPreferences(MODE_PRIVATE).getInt(PREF_KEY_CHILD_DEVICE_PORT, -1);
         if (preferredPort > 0) {
             portField.setText(String.valueOf(preferredPort));
+        } else {
+            portField.setText("10000");
         }
 
         connectButton.setOnClickListener(v -> {
