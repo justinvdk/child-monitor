@@ -20,9 +20,9 @@ android {
     }
 
     lintOptions {
-        abortOnError false
+        abortOnError true
+        warning "MissingTranslation"
     }
-
 
     dependencies {
         implementation "com.android.support:support-compat:26.1.0"

@@ -66,15 +66,21 @@ public class MonitorActivity extends Activity {
             final int audioEncoding = AudioCodecDefines.ENCODING;
 
             final int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
-            final AudioRecord audioRecord = new AudioRecord(
+        final AudioRecord audioRecord;
+        try {
+            audioRecord = new AudioRecord(
                     MediaRecorder.AudioSource.MIC,
                     frequency,
                     channelConfiguration,
                     audioEncoding,
                     bufferSize
             );
+        } catch (SecurityException e) {
+            // This should never happen, we asked for permission before
+            throw new RuntimeException(e);
+        }
 
-            final int pcmBufferSize = bufferSize*2;
+        final int pcmBufferSize = bufferSize*2;
             final short[] pcmBuffer = new short[pcmBufferSize];
             final byte[] ulawBuffer = new byte[pcmBufferSize];
 
