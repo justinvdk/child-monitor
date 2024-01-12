@@ -6,4 +6,4 @@
 
 <p>Child Monitor funktioniert auf Android 5.0 (Lollipop) und neuer, d.h. ab Android SDK 21.</p>
 
-<p>Die aktuelle Version von Child Monitor ist bestenfalls rudiment&auml;r. Es ist in der Lage, sich im Netzwerk bekannt zu machen, Clientverbindungen anzunehmen und Audio zu streamen.</p>
+<p>Achtung: Ab Version 1.0 ist Child Monitor inkompatibel mit älteren Versionen!</p>
