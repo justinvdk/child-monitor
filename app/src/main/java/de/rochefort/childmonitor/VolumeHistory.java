@@ -1,5 +1,7 @@
 package de.rochefort.childmonitor;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.util.CircularArray;
 
 public class VolumeHistory {
@@ -9,7 +11,10 @@ public class VolumeHistory {
     private final CircularArray<Double> mHistory;
     private final int mMaxHistory;
 
+    private final Handler uiHandler;
+
     VolumeHistory(int maxHistory) {
+        uiHandler = new Handler(Looper.getMainLooper());
         mMaxHistory = maxHistory;
         mHistory = new CircularArray<>(maxHistory);
     }
@@ -27,13 +32,16 @@ public class VolumeHistory {
         return mHistory.size();
     }
 
-    protected synchronized void addLast(double volume) {
-        if (volume > mMaxVolume) {
-            mMaxVolume = volume;
-            mVolumeNorm = 1.0 / volume;
-        }
-        mHistory.addLast(volume);
-        mHistory.removeFromStart(mHistory.size() - mMaxHistory);
+    private void addLast(double volume) {
+        // schedule editing of member vars on the ui event loop to avoid concurrency problems
+        uiHandler.post(() -> {
+            if (volume > mMaxVolume) {
+                mMaxVolume = volume;
+                mVolumeNorm = 1.0 / volume;
+            }
+            mHistory.addLast(volume);
+            mHistory.removeFromStart(mHistory.size() - mMaxHistory);
+        });
     }
 
     public void onAudioData(short[] data) {
@@ -51,7 +59,7 @@ public class VolumeHistory {
         addLast(volume);
     }
 
-    public synchronized VolumeHistory getSnapshot(int length) {
+    public VolumeHistory getSnapshot(int length) {
         length = Math.min(length, size());
         VolumeHistory copy = new VolumeHistory(length);
         copy.mMaxVolume = this.mMaxVolume;
