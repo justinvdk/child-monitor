@@ -16,169 +16,132 @@
  */
 package de.rochefort.childmonitor;
 
-import static de.rochefort.childmonitor.AudioCodecDefines.CODEC;
-
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.AudioManager;
-import android.media.AudioTrack;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
+import android.os.IBinder;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.TextView;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import android.widget.Toast;
 
 public class ListenActivity extends Activity {
-    final String TAG = "ChildMonitor";
-    // Sets an ID for the notification
-    final static int mNotificationId = 1;
+    final String TAG = "ListenActivity";
 
-    String _address;
-    int _port;
-    String _name;
-    NotificationManagerCompat _mNotifyMgr;
+    String address;
+    int port;
+    String name;
 
-    Thread _listenThread;
-    private final int frequency = AudioCodecDefines.FREQUENCY;
-    private final int channelConfiguration = AudioCodecDefines.CHANNEL_CONFIGURATION_OUT;
-    private final int audioEncoding = AudioCodecDefines.ENCODING;
-    private final int bufferSize = AudioTrack.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
-    private final int byteBufferSize = bufferSize*2;
+    // Don't attempt to unbind from the service unless the client has received some
+    // information about the service's state.
+    private boolean shouldUnbind;
 
-    private void streamAudio(final Socket socket, AudioListener listener) throws IllegalArgumentException, IllegalStateException, IOException {
-        Log.i(TAG, "Setting up stream");
+    // To invoke the bound service, first make sure that this value
+    // is not null.
+    private ListenService boundService;
 
-        final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-                frequency,
-                channelConfiguration,
-                audioEncoding,
-                bufferSize,
-                AudioTrack.MODE_STREAM);
+    private final ServiceConnection connection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service.  Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+            ListenService bs = ((ListenService.ListenBinder) service).getService();
 
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+            Toast.makeText(ListenActivity.this, R.string.connect,
+                    Toast.LENGTH_SHORT).show();
+            final VolumeView volumeView = findViewById(R.id.volume);
 
-        final InputStream is = socket.getInputStream();
-        int read = 0;
+            volumeView.setVolumeHistory(bs.getVolumeHistory());
+            bs.setUpdateCallback(volumeView::postInvalidate);
+            bs.setErrorCallback(() -> {
+                TextView status = findViewById(R.id.textStatus);
+                status.setText(R.string.disconnected);
+            });
 
-        audioTrack.play();
-
-        try {
-            final byte [] readBuffer = new byte[byteBufferSize];
-            final short [] decodedBuffer = new short[byteBufferSize*2];
-
-            while(socket.isConnected() && read != -1 && !Thread.currentThread().isInterrupted()) {
-                read = is.read(readBuffer);
-                int decoded = CODEC.decode(decodedBuffer, readBuffer, read, 0);
-
-                if(decoded > 0) {
-                    audioTrack.write(decodedBuffer, 0, decoded);
-                    short[] decodedBytes = new short[decoded];
-                    System.arraycopy(decodedBuffer, 0, decodedBytes, 0, decoded);
-                    listener.onAudio(decodedBytes);
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Connection failed", e);
-        } finally {
-            audioTrack.stop();
-            socket.close();
+            boundService = bs;
         }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            // Because it is running in our same process, we should never
+            // see this happen.
+            boundService = null;
+            Toast.makeText(ListenActivity.this, R.string.disconnected,
+                    Toast.LENGTH_SHORT).show();
+        }
+    };
+
+
+    void startAndBindService() {
+        final Context context = this;
+        final Intent intent = new Intent(context, ListenService.class);
+        intent.putExtra("name", name);
+        intent.putExtra("address", address);
+        intent.putExtra("port", port);
+        ContextCompat.startForegroundService(context, intent);
+        // Attempts to establish a connection with the service.  We use an
+        // explicit class name because we want a specific service
+        // implementation that we know will be running in our own process
+        // (and thus won't be supporting component replacement by other
+        // applications).
+        if (bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
+            shouldUnbind = true;
+            Log.i(TAG, "Bound service");
+        } else {
+            Log.e(TAG, "Error: The requested service doesn't " +
+                    "exist, or this client isn't allowed access to it.");
+        }
+    }
+
+    void doUnbindAndStopService() {
+        if (shouldUnbind) {
+            // Release information about the service's state.
+            unbindService(connection);
+            shouldUnbind = false;
+        }
+        final Context context = this;
+        final Intent intent = new Intent(context, ListenService.class);
+        context.stopService(intent);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final Bundle b = getIntent().getExtras();
-        _address = b.getString("address");
-        _port = b.getInt("port");
-        _name = b.getString("name");
-        // Gets an instance of the NotificationManager service
-        _mNotifyMgr =
-                NotificationManagerCompat.from(this);
+        final Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            address = bundle.getString("address");
+            port = bundle.getInt("port");
+            name = bundle.getString("name");
+            startAndBindService();
+        }
 
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setContentView(R.layout.activity_listen);
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(ListenActivity.this)
-                        .setOngoing(true)
-                        .setSmallIcon(R.drawable.listening_notification)
-                        .setContentTitle(getString(R.string.app_name))
-                        .setContentText(getString(R.string.listening));
+        final TextView connectedText = findViewById(R.id.connectedTo);
+        connectedText.setText(name);
 
-        _mNotifyMgr.notify(mNotificationId, mBuilder.build());
-
-        final TextView connectedText = (TextView) findViewById(R.id.connectedTo);
-        connectedText.setText(_name);
-
-        final TextView statusText = (TextView) findViewById(R.id.textStatus);
-        statusText.setText(R.string.listening);
-
-        final VolumeView volumeView = (VolumeView) findViewById(R.id.volume);
-
-        final AudioListener listener = audioData -> runOnUiThread(() -> volumeView.onAudioData(audioData));
-
-
-        _listenThread = new Thread(() -> {
-            try {
-                final Socket socket = new Socket(_address, _port);
-                streamAudio(socket, listener);
-            } catch (IOException e) {
-                Log.e(TAG, "Failed to stream audio", e);
-            }
-
-            if(!Thread.currentThread().isInterrupted()) {
-                // If this thread has not been interrupted, likely something
-                // bad happened with the connection to the child device. Play
-                // an alert to notify the user that the connection has been
-                // interrupted.
-                playAlert();
-
-                ListenActivity.this.runOnUiThread(() -> {
-                    final TextView connectedText1 = (TextView) findViewById(R.id.connectedTo);
-                    connectedText1.setText("");
-
-                    final TextView statusText1 = (TextView) findViewById(R.id.textStatus);
-                    statusText1.setText(R.string.disconnected);
-                    NotificationCompat.Builder mBuilder1 =
-                            new NotificationCompat.Builder(ListenActivity.this)
-                                    .setOngoing(false)
-                                    .setSmallIcon(R.drawable.listening_notification)
-                                    .setContentTitle(getString(R.string.app_name))
-                                    .setContentText(getString(R.string.disconnected));
-                    _mNotifyMgr.notify(mNotificationId, mBuilder1.build());
-                });
-            }
-        });
-
-        _listenThread.start();
-    }
-
-    @Override
-    protected void onStop() {
-        _listenThread.interrupt();
-        _listenThread = null;
-        super.onStop();
+        final TextView statusText = findViewById(R.id.textStatus);
+        if (bundle != null) {
+            statusText.setText(R.string.listening);
+        }
+        else {
+            statusText.setText(R.string.error_please_retry);
+        }
     }
 
     @Override
     public void onDestroy() {
+        doUnbindAndStopService();
+        boundService = null;
         super.onDestroy();
-    }
-
-    private void playAlert() {
-        final MediaPlayer mp = MediaPlayer.create(this, R.raw.upward_beep_chromatic_fifths);
-        if(mp != null) {
-            Log.i(TAG, "Playing alert");
-            mp.setOnCompletionListener(mp1 -> mp1.release());
-            mp.start();
-        } else {
-            Log.e(TAG, "Failed to play alert");
-        }
     }
 }
