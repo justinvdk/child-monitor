@@ -15,7 +15,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Messenger;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -23,11 +22,8 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class ListenService extends Service {
-    ArrayList<Messenger> clients = new ArrayList<>();
-
     private static final String TAG = "ListenService";
     public static final String CHANNEL_ID = TAG;
     public static final int ID = 1337;
@@ -45,6 +41,7 @@ public class ListenService extends Service {
     private Thread listenThread;
 
     private final VolumeHistory volumeHistory = new VolumeHistory(16_384);
+    private String childDeviceName;
 
     public ListenService() {
     }
@@ -93,11 +90,6 @@ public class ListenService extends Service {
         return volumeHistory;
     }
 
-    /**
-     * Show a notification while this service is running.
-     *
-     * @return
-     */
     private Notification buildNotification(Intent intent) {
         // In this sample, we'll use the same text for the ticker and the expanded notification
         CharSequence text = getText(R.string.listening);
@@ -108,7 +100,7 @@ public class ListenService extends Service {
         }
         address = bundle.getString("address");
         port = bundle.getInt("port");
-        String _name = bundle.getString("name");
+        childDeviceName = bundle.getString("name");
 
         // The PendingIntent to launch our activity if the user selects this notification
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
@@ -120,7 +112,7 @@ public class ListenService extends Service {
          .setOngoing(true)
          .setTicker(text)  // the status text
          .setContentTitle(text)  // the label of the entry
-         .setContentText(_name)  // the contents of the entry
+         .setContentText(childDeviceName)  // the contents of the entry
          .setContentIntent(contentIntent);
         return b.build();
     }
@@ -233,5 +225,9 @@ public class ListenService extends Service {
         } else {
             Log.e(TAG, "Failed to play alert");
         }
+    }
+
+    public String getChildDeviceName() {
+        return childDeviceName;
     }
 }
