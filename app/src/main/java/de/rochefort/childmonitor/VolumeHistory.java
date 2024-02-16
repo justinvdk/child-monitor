@@ -61,10 +61,11 @@ public class VolumeHistory {
 
     public VolumeHistory getSnapshot(int length) {
         length = Math.min(length, size());
-        VolumeHistory copy = new VolumeHistory(length);
+        final VolumeHistory copy = new VolumeHistory(length);
         copy.mMaxVolume = this.mMaxVolume;
         copy.mVolumeNorm = this.mVolumeNorm;
-        for (int i = 0; i < length; ++i) {
+        final int leftMost = size() - length;
+        for (int i = leftMost; i < size(); ++i) {
             copy.mHistory.addLast(mHistory.get(i));
         }
 
