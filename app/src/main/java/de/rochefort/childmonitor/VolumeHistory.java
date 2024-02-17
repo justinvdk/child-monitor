@@ -58,17 +58,4 @@ public class VolumeHistory {
         final double volume = sum / data.length;
         addLast(volume);
     }
-
-    public VolumeHistory getSnapshot(int length) {
-        length = Math.min(length, size());
-        final VolumeHistory copy = new VolumeHistory(length);
-        copy.mMaxVolume = this.mMaxVolume;
-        copy.mVolumeNorm = this.mVolumeNorm;
-        final int leftMost = size() - length;
-        for (int i = leftMost; i < size(); ++i) {
-            copy.mHistory.addLast(mHistory.get(i));
-        }
-
-        return copy;
-    }
 }
