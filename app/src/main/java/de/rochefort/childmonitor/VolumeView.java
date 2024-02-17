@@ -58,10 +58,9 @@ public class VolumeView extends View {
         final int height = canvas.getHeight();
         final int width = canvas.getWidth();
 
-        final VolumeHistory history = volumeHistory.getSnapshot(width);
-        final int size = history.size();    // Size is at most width
-        final double volumeNorm = history.getVolumeNorm();
-        final double normalizedVolume = history.get(size - 1);
+        final int size = volumeHistory.size();    // Size is at most width
+        final double volumeNorm = volumeHistory.getVolumeNorm();
+        final double normalizedVolume = volumeHistory.get(size - 1);
         final double relativeBrightness = Math.max(0.3, normalizedVolume);
         int blue;
         int rest;
@@ -76,11 +75,14 @@ public class VolumeView extends View {
         canvas.drawColor(rgb);
         final double margins = height * 0.1;
         final double graphHeight = height - 2.0 * margins;
+        int leftMost = Math.max(0, volumeHistory.size() - width);
         final double graphScale = graphHeight * volumeNorm;
+
         int xPrev = 0;
-        int yPrev = ((int) (margins + graphHeight - history.get(0) * graphScale));
-        for (int xNext = 1; xNext < size; ++xNext) {
-            int yNext = (int) (margins + graphHeight - history.get(xNext) * graphScale);
+        int yPrev = ((int) (margins + graphHeight - volumeHistory.get(leftMost) * graphScale));
+        int length = Math.min(size, width);
+        for (int xNext = 1; xNext < length-1; ++xNext) {
+            int yNext = (int) (margins + graphHeight - volumeHistory.get(leftMost + xNext) * graphScale);
             canvas.drawLine(xPrev, yPrev, xNext, yNext, paint);
             xPrev = xNext;
             yPrev = yNext;
