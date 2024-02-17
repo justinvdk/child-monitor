@@ -32,17 +32,9 @@ import android.widget.Toast;
 public class ListenActivity extends Activity {
     final String TAG = "ListenActivity";
 
-    String address;
-    int port;
-    String name;
-
     // Don't attempt to unbind from the service unless the client has received some
     // information about the service's state.
     private boolean shouldUnbind;
-
-    // To invoke the bound service, first make sure that this value
-    // is not null.
-    private ListenService boundService;
 
     private final ServiceConnection connection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -55,16 +47,15 @@ public class ListenActivity extends Activity {
 
             Toast.makeText(ListenActivity.this, R.string.connect,
                     Toast.LENGTH_SHORT).show();
+            final TextView connectedText = findViewById(R.id.connectedTo);
+            connectedText.setText(bs.getChildDeviceName());
             final VolumeView volumeView = findViewById(R.id.volume);
-
             volumeView.setVolumeHistory(bs.getVolumeHistory());
             bs.setUpdateCallback(volumeView::postInvalidate);
             bs.setErrorCallback(() -> {
                 TextView status = findViewById(R.id.textStatus);
                 status.setText(R.string.disconnected);
             });
-
-            boundService = bs;
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -72,20 +63,21 @@ public class ListenActivity extends Activity {
             // unexpectedly disconnected -- that is, its process crashed.
             // Because it is running in our same process, we should never
             // see this happen.
-            boundService = null;
             Toast.makeText(ListenActivity.this, R.string.disconnected,
                     Toast.LENGTH_SHORT).show();
         }
     };
 
 
-    void startAndBindService() {
+    void ensureServiceRunningAndBind(Bundle bundle) {
         final Context context = this;
         final Intent intent = new Intent(context, ListenService.class);
-        intent.putExtra("name", name);
-        intent.putExtra("address", address);
-        intent.putExtra("port", port);
-        ContextCompat.startForegroundService(context, intent);
+        if (bundle != null) {
+            intent.putExtra("name", bundle.getString("name"));
+            intent.putExtra("address", bundle.getString("address"));
+            intent.putExtra("port", bundle.getInt("port"));
+            ContextCompat.startForegroundService(context, intent);
+        }
         // Attempts to establish a connection with the service.  We use an
         // explicit class name because we want a specific service
         // implementation that we know will be running in our own process
@@ -116,32 +108,18 @@ public class ListenActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         final Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            address = bundle.getString("address");
-            port = bundle.getInt("port");
-            name = bundle.getString("name");
-            startAndBindService();
-        }
+        ensureServiceRunningAndBind(bundle);
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setContentView(R.layout.activity_listen);
 
-        final TextView connectedText = findViewById(R.id.connectedTo);
-        connectedText.setText(name);
-
         final TextView statusText = findViewById(R.id.textStatus);
-        if (bundle != null) {
-            statusText.setText(R.string.listening);
-        }
-        else {
-            statusText.setText(R.string.error_please_retry);
-        }
+        statusText.setText(R.string.listening);
     }
 
     @Override
     public void onDestroy() {
         doUnbindAndStopService();
-        boundService = null;
         super.onDestroy();
     }
 }
