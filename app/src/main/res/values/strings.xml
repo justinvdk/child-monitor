@@ -33,5 +33,4 @@
     <string name="discoverChildDescription">Select child from a list of discovered children on the network</string>
     <string name="enterChildAddress">Select Child by Address</string>
     <string name="enterChildAddressDescription">Enter the address and port of the child</string>
-    <string name="error_please_retry">Error, please retry.</string>
 </resources>
