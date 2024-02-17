@@ -78,9 +78,9 @@ public class VolumeView extends View {
         final double graphHeight = height - 2.0 * margins;
         final double graphScale = graphHeight * volumeNorm;
         int xPrev = 0;
-        int yPrev = ((int) (margins + graphHeight - volumeHistory.get(0) * graphScale));
+        int yPrev = ((int) (margins + graphHeight - history.get(0) * graphScale));
         for (int xNext = 1; xNext < size; ++xNext) {
-            int yNext = (int) (margins + graphHeight - volumeHistory.get(xNext) * graphScale);
+            int yNext = (int) (margins + graphHeight - history.get(xNext) * graphScale);
             canvas.drawLine(xPrev, yPrev, xNext, yNext, paint);
             xPrev = xNext;
             yPrev = yNext;
