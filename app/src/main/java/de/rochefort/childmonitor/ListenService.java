@@ -36,8 +36,6 @@ public class ListenService extends Service {
 
     private final IBinder binder = new ListenBinder();
     private NotificationManager notificationManager;
-    private String address;
-    private int port;
     private Thread listenThread;
 
     private final VolumeHistory volumeHistory = new VolumeHistory(16_384);
@@ -57,11 +55,18 @@ public class ListenService extends Service {
         Log.i(TAG, "Received start id " + startId + ": " + intent);
         // Display a notification about us starting.  We put an icon in the status bar.
         createNotificationChannel();
-        Notification n = buildNotification(intent);
-        startForeground(ID, n);
-        doListen();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            String name = extras.getString("name");
+            childDeviceName = name;
+            Notification n = buildNotification(name);
+            startForeground(ID, n);
+            String address = extras.getString("address");
+            int port = extras.getInt("port");
+            doListen(address, port);
+        }
 
-        return START_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     @Override
@@ -90,17 +95,9 @@ public class ListenService extends Service {
         return volumeHistory;
     }
 
-    private Notification buildNotification(Intent intent) {
+    private Notification buildNotification(String name) {
         // In this sample, we'll use the same text for the ticker and the expanded notification
         CharSequence text = getText(R.string.listening);
-
-        final Bundle bundle = intent.getExtras();
-        if (bundle == null) {
-            return null;
-        }
-        address = bundle.getString("address");
-        port = bundle.getInt("port");
-        childDeviceName = bundle.getString("name");
 
         // The PendingIntent to launch our activity if the user selects this notification
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
@@ -109,11 +106,11 @@ public class ListenService extends Service {
         // Set the info for the views that show in the notification panel.
         NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL_ID);
         b.setSmallIcon(R.drawable.listening_notification)  // the status icon
-         .setOngoing(true)
-         .setTicker(text)  // the status text
-         .setContentTitle(text)  // the label of the entry
-         .setContentText(childDeviceName)  // the contents of the entry
-         .setContentIntent(contentIntent);
+                .setOngoing(true)
+                .setTicker(text)  // the status text
+                .setContentTitle(text)  // the label of the entry
+                .setContentText(name)  // the contents of the entry
+                .setContentIntent(contentIntent);
         return b.build();
     }
 
@@ -146,7 +143,7 @@ public class ListenService extends Service {
     private Runnable mErrorCallback;
     private Runnable mUpdateCallback;
 
-    private void doListen() {
+    private void doListen(String address, int port) {
         listenThread = new Thread(() -> {
             try {
                 final Socket socket = new Socket(address, port);
