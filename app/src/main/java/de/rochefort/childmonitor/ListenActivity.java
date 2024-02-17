@@ -52,10 +52,7 @@ public class ListenActivity extends Activity {
             final VolumeView volumeView = findViewById(R.id.volume);
             volumeView.setVolumeHistory(bs.getVolumeHistory());
             bs.setUpdateCallback(volumeView::postInvalidate);
-            bs.setErrorCallback(() -> {
-                TextView status = findViewById(R.id.textStatus);
-                status.setText(R.string.disconnected);
-            });
+            bs.setErrorCallback(ListenActivity.this::postErrorMessage);
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -101,6 +98,13 @@ public class ListenActivity extends Activity {
         final Context context = this;
         final Intent intent = new Intent(context, ListenService.class);
         context.stopService(intent);
+    }
+
+    public void postErrorMessage() {
+        TextView status = findViewById(R.id.textStatus);
+        status.post(() -> {
+            status.setText(R.string.disconnected);
+        });
     }
 
     @Override
