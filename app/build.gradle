@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    compileSdk 26
+    compileSdk 34
 
     defaultConfig {
         applicationId "de.rochefort.childmonitor"
         minSdkVersion 21
-        //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 26
+        targetSdkVersion 34
         versionCode 11
         versionName "1.1"
     }
@@ -19,9 +19,7 @@ android {
         }
     }
 
-
     dependencies {
-        implementation "com.android.support:support-compat:26.1.0"
     }
     namespace 'de.rochefort.childmonitor'
     lint {
@@ -29,7 +27,16 @@ android {
         warning 'MissingTranslation'
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        // Sets Java compatibility to Java 17
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
+    kotlin {
+        jvmToolchain(17)
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core:1.12.0'
+    implementation 'androidx.core:core-ktx:1.12.0'
 }
