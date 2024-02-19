@@ -60,8 +60,13 @@ public class VolumeView extends View {
 
         final int size = volumeHistory.size();    // Size is at most width
         final double volumeNorm = volumeHistory.getVolumeNorm();
-        final double normalizedVolume = volumeHistory.get(size - 1);
-        final double relativeBrightness = Math.max(0.3, normalizedVolume);
+        final double relativeBrightness;
+        if (size > 0) {
+            final double normalizedVolume = volumeHistory.get(size - 1);
+            relativeBrightness = Math.max(0.3, normalizedVolume);
+        } else {
+            relativeBrightness = 0.3;
+        }
         int blue;
         int rest;
         if (relativeBrightness > 0.5) {
@@ -73,6 +78,9 @@ public class VolumeView extends View {
         }
         final int rgb = Color.rgb(rest, rest, blue);
         canvas.drawColor(rgb);
+        if (size == 0) {
+            return;
+        }
         final double margins = height * 0.1;
         final double graphHeight = height - 2.0 * margins;
         int leftMost = Math.max(0, volumeHistory.size() - width);
