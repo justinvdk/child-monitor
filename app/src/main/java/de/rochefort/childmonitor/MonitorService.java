@@ -167,9 +167,11 @@ public class MonitorService extends Service {
                         serviceConnection(socket);
                     }
                 } catch (Exception e) {
-                    // Just in case
-                    currentPort++;
-                    Log.e(TAG, "Failed to open server socket. Port increased to " + currentPort, e);
+                    if (Objects.equals(connectionToken, currentToken)) {
+                        // Just in case
+                        currentPort++;
+                        Log.e(TAG, "Failed to open server socket. Port increased to " + currentPort, e);
+                    }
                 }
             }
         });
