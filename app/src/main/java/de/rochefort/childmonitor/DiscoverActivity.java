@@ -31,6 +31,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 
 public class DiscoverActivity extends Activity {
     private static final String PREF_KEY_CHILD_DEVICE_ADDRESS = "childDeviceAddress";
@@ -189,7 +191,16 @@ public class DiscoverActivity extends Activity {
                         public void onServiceResolved(final NsdServiceInfo serviceInfo) {
                             Log.i(TAG, "Resolve Succeeded: " + serviceInfo);
 
-                            DiscoverActivity.this.runOnUiThread(() -> availableServicesAdapter.add(new ServiceInfoWrapper(serviceInfo)));
+                            DiscoverActivity.this.runOnUiThread(() -> {
+                                for (int index=0; index < availableServicesAdapter.getCount(); index++) {
+                                    ServiceInfoWrapper item = availableServicesAdapter.getItem(index);
+                                    if (item != null && item.matches(serviceInfo)) {
+                                        // Prevent inserting duplicates
+                                        return;
+                                    }
+                                }
+                                availableServicesAdapter.add(new ServiceInfoWrapper(serviceInfo));
+                            });
                         }
                     };
 
@@ -249,6 +260,10 @@ class ServiceInfoWrapper {
     public ServiceInfoWrapper(NsdServiceInfo info)
     {
         this.info = info;
+    }
+
+    public boolean matches(NsdServiceInfo other) {
+        return Objects.equals(this.info.getHost(), other.getHost()) && this.info.getPort() == other.getPort();
     }
 
     public String getAddress()
