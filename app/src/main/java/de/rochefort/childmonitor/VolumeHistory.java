@@ -21,42 +21,42 @@ import android.os.Looper;
 import android.support.v4.util.CircularArray;
 
 public class VolumeHistory {
-    private double mMaxVolume = 0.25;
+    private double maxVolume = 0.25;
 
-    private double mVolumeNorm = 1.0 / mMaxVolume;
-    private final CircularArray<Double> mHistory;
-    private final int mMaxHistory;
+    private double volumeNorm = 1.0 / maxVolume;
+    private final CircularArray<Double> historyData;
+    private final int maxHistory;
 
     private final Handler uiHandler;
 
     VolumeHistory(int maxHistory) {
         uiHandler = new Handler(Looper.getMainLooper());
-        mMaxHistory = maxHistory;
-        mHistory = new CircularArray<>(maxHistory);
+        this.maxHistory = maxHistory;
+        historyData = new CircularArray<>(maxHistory);
     }
 
 
     public double getVolumeNorm() {
-        return mVolumeNorm;
+        return volumeNorm;
     }
 
     public double get(int i) {
-        return mHistory.get(i);
+        return historyData.get(i);
     }
 
     public int size() {
-        return mHistory.size();
+        return historyData.size();
     }
 
     private void addLast(double volume) {
         // schedule editing of member vars on the ui event loop to avoid concurrency problems
         uiHandler.post(() -> {
-            if (volume > mMaxVolume) {
-                mMaxVolume = volume;
-                mVolumeNorm = 1.0 / volume;
+            if (volume > maxVolume) {
+                maxVolume = volume;
+                volumeNorm = 1.0 / volume;
             }
-            mHistory.addLast(volume);
-            mHistory.removeFromStart(mHistory.size() - mMaxHistory);
+            historyData.addLast(volume);
+            historyData.removeFromStart(historyData.size() - maxHistory);
         });
     }
 
