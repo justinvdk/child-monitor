@@ -1,16 +1,16 @@
-/**
+/*
  * This file is part of Child Monitor.
- * <p>
+ *
  * Child Monitor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ *
  * Child Monitor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU General Public License
  * along with Child Monitor. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -21,7 +21,6 @@ import static de.rochefort.childmonitor.AudioCodecDefines.CODEC;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -145,7 +144,7 @@ public class MonitorService extends Service {
         final Object currentToken = new Object();
         connectionToken = currentToken;
 
-        monitorThread = new Thread(() -> {
+        mt = new Thread(() -> {
             while (Objects.equals(connectionToken, currentToken)) {
                 try (ServerSocket serverSocket = new ServerSocket(currentPort)) {
                     currentSocket = serverSocket;
@@ -175,7 +174,8 @@ public class MonitorService extends Service {
                 }
             }
         });
-        monitorThread.start();
+        monitorThread = mt;
+        mt.start();
     }
 
     private void registerService(final int port) {
@@ -236,15 +236,12 @@ public class MonitorService extends Service {
                 serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
     }
 
-    /**
-     * Unregister the service and assigns the listener
-     * to null.
-     */
     private void unregisterService() {
-        if (registrationListener != null) {
+        NsdManager.RegistrationListener currentListener = registrationListener;
+        if (currentListener != null) {
             Log.i(TAG, "Unregistering monitoring service");
 
-            nsdManager.unregisterService(registrationListener);
+            nsdManager.unregisterService(currentListener);
             registrationListener = null;
         }
     }
