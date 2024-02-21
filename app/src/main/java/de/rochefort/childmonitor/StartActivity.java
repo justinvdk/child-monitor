@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Child Monitor.
  *
  * Child Monitor is free software: you can redistribute it and/or modify
@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 
 public class StartActivity extends Activity {
