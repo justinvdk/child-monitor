@@ -160,7 +160,7 @@ public class ListenService extends Service {
     private Runnable mUpdateCallback;
 
     private void doListen(String address, int port) {
-        listenThread = new Thread(() -> {
+        Thread lt = new Thread(() -> {
             try {
                 final Socket socket = new Socket(address, port);
                 streamAudio(socket);
@@ -181,8 +181,8 @@ public class ListenService extends Service {
                 }
             }
         });
-
-        listenThread.start();
+        listenThread = lt;
+        lt.start();
     }
 
 
