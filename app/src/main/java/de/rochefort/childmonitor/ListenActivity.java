@@ -82,7 +82,7 @@ public class ListenActivity extends Activity {
         // applications).
         if (bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
             shouldUnbind = true;
-            Log.i(TAG, "Bound service");
+            Log.i(TAG, "Bound listen service");
         } else {
             Log.e(TAG, "Error: The requested service doesn't " +
                     "exist, or this client isn't allowed access to it.");
