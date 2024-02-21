@@ -42,7 +42,7 @@ import java.net.Socket;
 public class ListenService extends Service {
     private static final String TAG = "ListenService";
     public static final String CHANNEL_ID = TAG;
-    public static final int ID = 1337;
+    public static final int ID = 902938409;
 
     private final int frequency = AudioCodecDefines.FREQUENCY;
     private final int channelConfiguration = AudioCodecDefines.CHANNEL_CONFIGURATION_OUT;
