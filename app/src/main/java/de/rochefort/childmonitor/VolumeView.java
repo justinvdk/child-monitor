@@ -56,8 +56,8 @@ public class VolumeView extends View {
             return;
         }
 
-        final int height = canvas.getHeight();
-        final int width = canvas.getWidth();
+        final int height = getHeight();
+        final int width = getWidth();
 
         final int size = volumeHistory.size();    // Size is at most width
         final double volumeNorm = volumeHistory.getVolumeNorm();
