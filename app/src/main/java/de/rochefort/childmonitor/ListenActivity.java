@@ -30,7 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ListenActivity extends Activity {
-    final String TAG = "ListenActivity";
+    private static final String TAG = "ListenActivity";
 
     // Don't attempt to unbind from the service unless the client has received some
     // information about the service's state.
@@ -102,9 +102,7 @@ public class ListenActivity extends Activity {
 
     public void postErrorMessage() {
         TextView status = findViewById(R.id.textStatus);
-        status.post(() -> {
-            status.setText(R.string.disconnected);
-        });
+        status.post(() -> status.setText(R.string.disconnected));
     }
 
     @Override
