@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdk 26
 
     defaultConfig {
         applicationId "de.rochefort.childmonitor"
@@ -27,5 +27,9 @@ android {
     lint {
         abortOnError true
         warning 'MissingTranslation'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }

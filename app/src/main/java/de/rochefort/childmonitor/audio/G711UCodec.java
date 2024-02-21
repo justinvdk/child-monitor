@@ -29,8 +29,8 @@ public class G711UCodec {
     // s001wxyzabcde...s101wxyz
     // s01wxyzabcdef...s110wxyz
     // s1wxyzabcdefg...s111wxyz
-    private static byte[] table13to8 = new byte[8192];
-    private static short[] table8to16 = new short[256];
+    private static final byte[] table13to8 = new byte[8192];
+    private static final short[] table8to16 = new short[256];
     static {
         // b13 --> b8
         for (int p = 1, q = 0; p <= 0x80; p <<= 1, q+=0x10) {

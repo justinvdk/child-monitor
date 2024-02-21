@@ -39,7 +39,7 @@ public class StartActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        final Button monitorButton = (Button) findViewById(R.id.useChildDevice);
+        final Button monitorButton = findViewById(R.id.useChildDevice);
         monitorButton.setOnClickListener(v -> {
             Log.i(TAG, "Starting up monitor");
 
@@ -50,7 +50,7 @@ public class StartActivity extends Activity {
             }
         });
 
-        final Button connectButton = (Button) findViewById(R.id.useParentDevice);
+        final Button connectButton = findViewById(R.id.useParentDevice);
         connectButton.setOnClickListener(v -> {
             Log.i(TAG, "Starting connection activity");
             if (isMulticastPermissionGranted()) {
