@@ -1,16 +1,16 @@
 /*
  * This file is part of Child Monitor.
- * <p>
+ *
  * Child Monitor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ *
  * Child Monitor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU General Public License
  * along with Child Monitor. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,6 +30,7 @@ import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class MonitorActivity extends Activity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             // This is called when the connection with the service has been
             // established, giving us the service object we can use to
-            // interact with the service.  Because we have bound to a explicit
+            // interact with the service. Because we have bound to an explicit
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
             MonitorService bs = ((MonitorService.MonitorBinder) service).getService();
@@ -53,6 +54,8 @@ public class MonitorActivity extends Activity {
             // unexpectedly disconnected -- that is, its process crashed.
             // Because it is running in our same process, we should never
             // see this happen.
+            Toast.makeText(MonitorActivity.this, R.string.disconnected,
+                    Toast.LENGTH_SHORT).show();
         }
     };
     private boolean shouldUnbind;
@@ -120,7 +123,7 @@ public class MonitorActivity extends Activity {
         // applications).
         if (bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
             shouldUnbind = true;
-            Log.i(TAG, "Bound service");
+            Log.i(TAG, "Bound monitor service");
         } else {
             Log.e(TAG, "Error: The requested service doesn't " +
                     "exist, or this client isn't allowed access to it.");
