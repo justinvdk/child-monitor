@@ -25,32 +25,33 @@ import android.util.AttributeSet;
 import android.view.View;
 
 public class VolumeView extends View {
-    private Paint paint;
-    private VolumeHistory _volumeHistory;
+    private final Paint paint;
+    private VolumeHistory volumeHistory;
 
     public VolumeView(Context context) {
         super(context);
-        init();
+        this.paint = initPaint();
     }
 
     public VolumeView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        this.paint = initPaint();
     }
 
     public VolumeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        this.paint = initPaint();
     }
 
-    private void init() {
-        paint = new Paint();
+    private Paint initPaint() {
+        Paint paint = new Paint();
         paint.setColor(Color.rgb(255, 127, 0));
+        return paint;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        final VolumeHistory volumeHistory = _volumeHistory;
+        final VolumeHistory volumeHistory = this.volumeHistory;
         if (volumeHistory == null) {
             return;
         }
@@ -98,6 +99,6 @@ public class VolumeView extends View {
     }
 
     public void setVolumeHistory(VolumeHistory volumeHistory) {
-        this._volumeHistory = volumeHistory;
+        this.volumeHistory = volumeHistory;
     }
 }
