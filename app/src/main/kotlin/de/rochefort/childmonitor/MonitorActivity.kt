@@ -39,7 +39,7 @@ class MonitorActivity : Activity() {
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
             val bs = (service as MonitorBinder).service
-            bs!!.setMonitorActivity(this@MonitorActivity)
+            bs.setMonitorActivity(this@MonitorActivity)
         }
 
         override fun onServiceDisconnected(className: ComponentName) {
@@ -85,8 +85,9 @@ class MonitorActivity : Activity() {
                     val linkAddresses = cm.getLinkProperties(network)!!.linkAddresses
                     for (linkAddress in linkAddresses) {
                         val address = linkAddress.address
-                        if (!address.isLinkLocalAddress && !address.isLoopbackAddress) {
-                            listenAddresses.add(address.hostAddress + " (" + networkInfo.typeName + ")")
+                        val hostAddress = address.hostAddress
+                        if (!address.isLinkLocalAddress && !address.isLoopbackAddress && hostAddress != null) {
+                            listenAddresses.add(hostAddress + " (" + networkInfo.typeName + ")")
                         }
                     }
                 }

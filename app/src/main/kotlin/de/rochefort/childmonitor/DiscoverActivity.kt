@@ -44,9 +44,9 @@ class DiscoverActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_discover)
         val discoverChildButton = findViewById<Button>(R.id.discoverChildButton)
-        discoverChildButton.setOnClickListener { v: View? -> loadDiscoveryViaMdns() }
+        discoverChildButton.setOnClickListener { _: View? -> loadDiscoveryViaMdns() }
         val enterChildAddressButton = findViewById<Button>(R.id.enterChildAddressButton)
-        enterChildAddressButton.setOnClickListener { v: View? -> loadDiscoveryViaAddress() }
+        enterChildAddressButton.setOnClickListener { _: View? -> loadDiscoveryViaAddress() }
     }
 
     private fun loadDiscoveryViaMdns() {
@@ -69,7 +69,7 @@ class DiscoverActivity : Activity() {
         } else {
             portField.setText("10000")
         }
-        connectButton.setOnClickListener { v: View? ->
+        connectButton.setOnClickListener { _: View? ->
             Log.i(TAG, "Connecting to child device via address")
             val addressString = addressField.text.toString()
             val portString = portField.text.toString()
@@ -93,23 +93,19 @@ class DiscoverActivity : Activity() {
 
     override fun onDestroy() {
         Log.i(TAG, "ChildMonitoring stop")
-        if (discoveryListener != null) {
+        if (this.discoveryListener != null) {
             Log.i(TAG, "Unregistering monitoring service")
-            nsdManager!!.stopServiceDiscovery(discoveryListener)
-            discoveryListener = null
+            this.nsdManager!!.stopServiceDiscovery(discoveryListener)
+            this.discoveryListener = null
         }
         super.onDestroy()
     }
 
-    fun startServiceDiscovery(serviceType: String) {
+    private fun startServiceDiscovery(serviceType: String) {
         val nsdManager = this.getSystemService(NSD_SERVICE) as NsdManager
-        if (nsdManager == null) {
-            Log.e(TAG, "Could not obtain nsdManager")
-            return
-        }
         val wifi = this.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
         val multicastReleaser: Runnable
-        multicastReleaser = if (wifi != null) {
+        multicastReleaser = run {
             val multicastLock = wifi.createMulticastLock("multicastLock")
             multicastLock.setReferenceCounted(true)
             multicastLock.acquire()
@@ -120,20 +116,21 @@ class DiscoverActivity : Activity() {
                     //dont really care
                 }
             }
-        } else {
-            Runnable {}
         }
         val serviceTable = findViewById<ListView>(R.id.ServiceTable)
         val availableServicesAdapter = ArrayAdapter<ServiceInfoWrapper>(this,
                 R.layout.available_children_list)
         serviceTable.adapter = availableServicesAdapter
-        serviceTable.onItemClickListener = OnItemClickListener { parent: AdapterView<*>, view: View?, position: Int, id: Long ->
+        serviceTable.onItemClickListener = OnItemClickListener { parent: AdapterView<*>, _: View?, position: Int, _: Long ->
             val info = parent.getItemAtPosition(position) as ServiceInfoWrapper
-            connectToChild(info.address, info.port, info.name)
+            val address = info.address
+            if (address != null) {
+                connectToChild(address, info.port, info.name)
+            }
         }
 
         // Instantiate a new DiscoveryListener
-        discoveryListener = object : DiscoveryListener {
+        this.discoveryListener = object : DiscoveryListener {
             //  Called as soon as service discovery begins.
             override fun onDiscoveryStarted(regType: String) {
                 Log.d(TAG, "Service discovery started")
@@ -223,7 +220,7 @@ internal class ServiceInfoWrapper(private val info: NsdServiceInfo) {
         return info.host == other.host && info.port == other.port
     }
 
-    val address: String
+    val address: String?
         get() = info.host.hostAddress
     val port: Int
         get() = info.port

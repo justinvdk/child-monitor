@@ -33,7 +33,7 @@ class StartActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
         val monitorButton = findViewById<Button>(R.id.useChildDevice)
-        monitorButton.setOnClickListener { v: View? ->
+        monitorButton.setOnClickListener { _: View? ->
             Log.i(TAG, "Starting up monitor")
             if (isAudioRecordingPermissionGranted) {
                 startActivity(Intent(applicationContext, MonitorActivity::class.java))
@@ -42,7 +42,7 @@ class StartActivity : Activity() {
             }
         }
         val connectButton = findViewById<Button>(R.id.useParentDevice)
-        connectButton.setOnClickListener { v: View? ->
+        connectButton.setOnClickListener { _: View? ->
             Log.i(TAG, "Starting connection activity")
             if (isMulticastPermissionGranted) {
                 val i = Intent(applicationContext, DiscoverActivity::class.java)
