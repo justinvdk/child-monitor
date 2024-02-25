@@ -44,10 +44,6 @@ class G711UCodec {
         return count
     }
 
-    fun getSampleCount(frameSize: Int): Int {
-        return frameSize
-    }
-
     companion object {
         // s00000001wxyz...s000wxyz
         // s0000001wxyza...s001wxyz
