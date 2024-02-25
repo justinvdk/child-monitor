@@ -19,16 +19,10 @@ package de.rochefort.childmonitor
 import android.media.AudioFormat
 import de.rochefort.childmonitor.audio.G711UCodec
 
-class AudioCodecDefines private constructor() {
-    init {
-        throw IllegalStateException("Do not instantiate!")
-    }
-
-    companion object {
-        const val FREQUENCY = 8000
-        const val ENCODING = AudioFormat.ENCODING_PCM_16BIT
-        val CODEC = G711UCodec()
-        const val CHANNEL_CONFIGURATION_IN = AudioFormat.CHANNEL_IN_MONO
-        const val CHANNEL_CONFIGURATION_OUT = AudioFormat.CHANNEL_OUT_MONO
-    }
+object AudioCodecDefines {
+    const val FREQUENCY = 8000
+    const val ENCODING = AudioFormat.ENCODING_PCM_16BIT
+    val CODEC = G711UCodec()
+    const val CHANNEL_CONFIGURATION_IN = AudioFormat.CHANNEL_IN_MONO
+    const val CHANNEL_CONFIGURATION_OUT = AudioFormat.CHANNEL_OUT_MONO
 }

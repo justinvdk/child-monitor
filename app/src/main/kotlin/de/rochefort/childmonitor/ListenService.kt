@@ -37,9 +37,9 @@ import java.io.IOException
 import java.net.Socket
 
 class ListenService : Service() {
-    private val frequency: Int = AudioCodecDefines.Companion.FREQUENCY
-    private val channelConfiguration: Int = AudioCodecDefines.Companion.CHANNEL_CONFIGURATION_OUT
-    private val audioEncoding: Int = AudioCodecDefines.Companion.ENCODING
+    private val frequency: Int = AudioCodecDefines.FREQUENCY
+    private val channelConfiguration: Int = AudioCodecDefines.CHANNEL_CONFIGURATION_OUT
+    private val audioEncoding: Int = AudioCodecDefines.ENCODING
     private val bufferSize = AudioTrack.getMinBufferSize(frequency, channelConfiguration, audioEncoding)
     private val byteBufferSize = bufferSize * 2
     private val binder: IBinder = ListenBinder()
@@ -175,7 +175,7 @@ class ListenService : Service() {
             val decodedBuffer = ShortArray(byteBufferSize * 2)
             while (socket.isConnected && read != -1 && !Thread.currentThread().isInterrupted) {
                 read = inputStream.read(readBuffer)
-                val decoded: Int = AudioCodecDefines.Companion.CODEC.decode(decodedBuffer, readBuffer, read, 0)
+                val decoded: Int = AudioCodecDefines.CODEC.decode(decodedBuffer, readBuffer, read, 0)
                 if (decoded > 0) {
                     audioTrack.write(decodedBuffer, 0, decoded)
                     val decodedBytes = ShortArray(decoded)

@@ -59,9 +59,9 @@ class MonitorService : Service() {
             val statusText = ma.findViewById<TextView>(R.id.textStatus)
             statusText.setText(R.string.streaming)
         }
-        val frequency: Int = AudioCodecDefines.Companion.FREQUENCY
-        val channelConfiguration: Int = AudioCodecDefines.Companion.CHANNEL_CONFIGURATION_IN
-        val audioEncoding: Int = AudioCodecDefines.Companion.ENCODING
+        val frequency: Int = AudioCodecDefines.FREQUENCY
+        val channelConfiguration: Int = AudioCodecDefines.CHANNEL_CONFIGURATION_IN
+        val audioEncoding: Int = AudioCodecDefines.ENCODING
         val bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding)
         val audioRecord: AudioRecord = try {
             AudioRecord(
@@ -85,7 +85,7 @@ class MonitorService : Service() {
             Log.d(TAG, "Socket send buffer size: " + socket.sendBufferSize)
             while (socket.isConnected && (this.currentSocket != null) && !Thread.currentThread().isInterrupted) {
                 val read = audioRecord.read(pcmBuffer, 0, bufferSize)
-                val encoded: Int = AudioCodecDefines.Companion.CODEC.encode(pcmBuffer, read, ulawBuffer, 0)
+                val encoded: Int = AudioCodecDefines.CODEC.encode(pcmBuffer, read, ulawBuffer, 0)
                 out.write(ulawBuffer, 0, encoded)
             }
         } catch (e: Exception) {
