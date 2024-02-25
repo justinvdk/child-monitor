@@ -81,11 +81,11 @@ class G711UCodec {
                 q += 0x10
             }
             // b8 --> b16
-            for (q in 0..7) {
+            for (r in 0..7) {
                 var i = 0
-                var m = q shl 4
+                var m = r shl 4
                 while (i < 16) {
-                    val v = (i + 0x10 shl q) - 0x10 shl 3
+                    val v = (i + 0x10 shl r) - 0x10 shl 3
                     table8to16[m xor 0x7F] = v.toShort()
                     table8to16[(m xor 0x7F) + 128] = (65536 - v).toShort()
                     i++
