@@ -58,29 +58,27 @@ class G711UCodec {
 
         init {
             // b13 --> b8
-            run {
-                var p = 1
-                var q = 0
-                while (p <= 0x80) {
-                    var i = 0
-                    var j = (p shl 4) - 0x10
-                    while (i < 16) {
-                        val v = i + q xor 0x7F
-                        val value1 = v.toByte()
-                        val value2 = (v + 128).toByte()
-                        var m = j
-                        val e = j + p
-                        while (m < e) {
-                            table13to8[m] = value1
-                            table13to8[8191 - m] = value2
-                            m++
-                        }
-                        i++
-                        j += p
+            var p = 1
+            var q = 0
+            while (p <= 0x80) {
+                var i = 0
+                var j = (p shl 4) - 0x10
+                while (i < 16) {
+                    val v = i + q xor 0x7F
+                    val value1 = v.toByte()
+                    val value2 = (v + 128).toByte()
+                    var m = j
+                    val e = j + p
+                    while (m < e) {
+                        table13to8[m] = value1
+                        table13to8[8191 - m] = value2
+                        m++
                     }
-                    p = p shl 1
-                    q += 0x10
+                    i++
+                    j += p
                 }
+                p = p shl 1
+                q += 0x10
             }
             // b8 --> b16
             for (q in 0..7) {
