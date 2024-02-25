@@ -33,8 +33,6 @@ import android.widget.EditText
 import android.widget.ListView
 import android.widget.Toast
 
-val TAG = "ChildMonitor"
-
 class DiscoverActivity : Activity() {
     private var nsdManager: NsdManager? = null
     private var discoveryListener: DiscoveryListener? = null
@@ -210,6 +208,7 @@ class DiscoverActivity : Activity() {
     }
 
     companion object {
+        private const val TAG = "ChildMonitor"
         private const val PREF_KEY_CHILD_DEVICE_ADDRESS = "childDeviceAddress"
         private const val PREF_KEY_CHILD_DEVICE_PORT = "childDevicePort"
     }
