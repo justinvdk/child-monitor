@@ -27,12 +27,12 @@ android {
         warning 'MissingTranslation'
     }
     compileOptions {
-        // Sets Java compatibility to Java 17
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        // Sets Java compatibility to Java 21
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     kotlin {
-        jvmToolchain(17)
+        jvmToolchain(21)
     }
 }
 
