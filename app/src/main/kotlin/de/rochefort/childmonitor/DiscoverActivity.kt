@@ -219,19 +219,15 @@ internal class ServiceInfoWrapper(private val info: NsdServiceInfo) {
         get() = info.host.hostAddress
     val port: Int
         get() = info.port
-    val name: String
-        get() {
-            // If there is more than one service with the same name on the network, it will
-            // have a number at the end, but will appear as the following:
-            //   "ChildMonitor\\032(number)
-            // or
-            //   "ChildMonitor\032(number)
-            // Replace \\032 and \032 with a " "
-            var serviceName = info.serviceName
-            serviceName = serviceName.replace("\\\\032", " ")
-            serviceName = serviceName.replace("\\032", " ")
-            return serviceName
-        }
+    // If there is more than one service with the same name on the network, it will
+    // have a number at the end, but will appear as the following:
+    //   "ChildMonitor\\032(number)
+    // or
+    //   "ChildMonitor\032(number)
+    // Replace \\032 and \032 with a " "
+    val name: String = info.serviceName
+        .replace("\\\\032", " ")
+        .replace("\\032", " ")
 
     override fun toString(): String {
         return name
