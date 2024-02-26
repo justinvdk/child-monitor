@@ -91,10 +91,10 @@ class DiscoverActivity : Activity() {
 
     override fun onDestroy() {
         Log.i(TAG, "ChildMonitoring stop")
-        if (this.discoveryListener != null) {
-            Log.i(TAG, "Unregistering monitoring service")
-            this.nsdManager!!.stopServiceDiscovery(discoveryListener)
+        this.discoveryListener?.let {
             this.discoveryListener = null
+            Log.i(TAG, "Unregistering monitoring service")
+            this.nsdManager!!.stopServiceDiscovery(it)
         }
         super.onDestroy()
     }
@@ -102,17 +102,14 @@ class DiscoverActivity : Activity() {
     private fun startServiceDiscovery(serviceType: String) {
         val nsdManager = this.getSystemService(NSD_SERVICE) as NsdManager
         val wifi = this.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
-        val multicastReleaser: Runnable
-        multicastReleaser = run {
-            val multicastLock = wifi.createMulticastLock("multicastLock")
-            multicastLock.setReferenceCounted(true)
-            multicastLock.acquire()
-            Runnable {
-                try {
-                    multicastLock.release()
-                } catch (ignored: Exception) {
-                    //dont really care
-                }
+        val multicastLock = wifi.createMulticastLock("multicastLock")
+        multicastLock.setReferenceCounted(true)
+        multicastLock.acquire()
+        val multicastReleaser = {
+            try {
+                multicastLock.release()
+            } catch (ignored: Exception) {
+                // don't really care
             }
         }
         val serviceTable = findViewById<ListView>(R.id.ServiceTable)
@@ -121,9 +118,8 @@ class DiscoverActivity : Activity() {
         serviceTable.adapter = availableServicesAdapter
         serviceTable.onItemClickListener = OnItemClickListener { parent: AdapterView<*>, _: View?, position: Int, _: Long ->
             val info = parent.getItemAtPosition(position) as ServiceInfoWrapper
-            val address = info.address
-            if (address != null) {
-                connectToChild(address, info.port, info.name)
+            info.address?.let {
+                connectToChild(it, info.port, info.name)
             }
         }
 
@@ -172,24 +168,24 @@ class DiscoverActivity : Activity() {
                 // When the network service is no longer available.
                 // Internal bookkeeping code goes here.
                 Log.e(TAG, "Service lost: $service")
-                multicastReleaser.run()
+                multicastReleaser()
             }
 
             override fun onDiscoveryStopped(serviceType: String) {
                 Log.i(TAG, "Discovery stopped: $serviceType")
-                multicastReleaser.run()
+                multicastReleaser()
             }
 
             override fun onStartDiscoveryFailed(serviceType: String, errorCode: Int) {
                 Log.e(TAG, "Discovery failed: Error code: $errorCode")
                 nsdManager.stopServiceDiscovery(this)
-                multicastReleaser.run()
+                multicastReleaser()
             }
 
             override fun onStopDiscoveryFailed(serviceType: String, errorCode: Int) {
                 Log.e(TAG, "Discovery failed: Error code: $errorCode")
                 nsdManager.stopServiceDiscovery(this)
-                multicastReleaser.run()
+                multicastReleaser()
             }
         }
         nsdManager.discoverServices(

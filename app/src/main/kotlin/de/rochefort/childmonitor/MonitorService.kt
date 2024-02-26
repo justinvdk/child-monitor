@@ -200,11 +200,10 @@ class MonitorService : Service() {
     }
 
     private fun unregisterService() {
-        val currentListener = this.registrationListener
-        if (currentListener != null) {
-            Log.i(TAG, "Unregistering monitoring service")
-            this.nsdManager!!.unregisterService(currentListener)
+        this.registrationListener?.let {
             this.registrationListener = null
+            Log.i(TAG, "Unregistering monitoring service")
+            this.nsdManager!!.unregisterService(it)
         }
     }
 
@@ -231,18 +230,16 @@ class MonitorService : Service() {
     }
 
     override fun onDestroy() {
-        val mt = this.monitorThread
-        if (mt != null) {
-            mt.interrupt()
+        this.monitorThread?.let {
             this.monitorThread = null
+            it.interrupt()
         }
         unregisterService()
         this.connectionToken = null
-        val sock = this.currentSocket
-        if (sock != null) {
+        this.currentSocket?.let {
+            this.currentSocket = null
             try {
-                sock.close()
-                this.currentSocket = null
+                it.close()
             } catch (e: IOException) {
                 Log.e(TAG, "Failed to close active socket on port $currentPort")
             }

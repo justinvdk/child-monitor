@@ -120,9 +120,9 @@ class MonitorActivity : Activity() {
 
     private fun doUnbindAndStopService() {
         if (this.shouldUnbind) {
+            this.shouldUnbind = false
             // Release information about the service's state.
             unbindService(connection)
-            this.shouldUnbind = false
         }
         val context: Context = this
         val intent = Intent(context, MonitorService::class.java)

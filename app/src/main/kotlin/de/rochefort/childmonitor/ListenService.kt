@@ -58,25 +58,23 @@ class ListenService : Service() {
         Log.i(TAG, "Received start id $startId: $intent")
         // Display a notification about us starting.  We put an icon in the status bar.
         createNotificationChannel()
-        val extras = intent.extras
-        if (extras != null) {
-            val name = extras.getString("name")
+        intent.extras?.let {
+            val name = it.getString("name")
             childDeviceName = name
             val n = buildNotification(name)
             val foregroundServiceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK else 0 // Keep the linter happy
             ServiceCompat.startForeground(this, ID, n, foregroundServiceType)
-            val address = extras.getString("address")
-            val port = extras.getInt("port")
+            val address = it.getString("address")
+            val port = it.getInt("port")
             doListen(address, port)
         }
         return START_REDELIVER_INTENT
     }
 
     override fun onDestroy() {
-        val lt = this.listenThread
-        if (lt != null) {
-            lt.interrupt()
+        this.listenThread?.let {
             this.listenThread = null
+            it.interrupt()
         }
 
         // Cancel the persistent notification.
@@ -121,12 +119,12 @@ class ListenService : Service() {
         }
     }
 
-    fun setErrorCallback(errorCallback: Runnable?) {
-        mErrorCallback = errorCallback
+    fun setErrorCallback(errorCallback: (() -> Unit)) {
+        this.errorCallback = errorCallback
     }
 
-    fun setUpdateCallback(updateCallback: Runnable?) {
-        mUpdateCallback = updateCallback
+    fun setUpdateCallback(updateCallback: (() -> Unit)) {
+        this.updateCallback = updateCallback
     }
 
     inner class ListenBinder : Binder() {
@@ -134,8 +132,8 @@ class ListenService : Service() {
             get() = this@ListenService
     }
 
-    private var mErrorCallback: Runnable? = null
-    private var mUpdateCallback: Runnable? = null
+    private var errorCallback: (() -> Unit)? = null
+    private var updateCallback: (() -> Unit)? = null
     private fun doListen(address: String?, port: Int) {
         val lt = Thread {
             try {
@@ -150,8 +148,7 @@ class ListenService : Service() {
                 // an alert to notify the user that the connection has been
                 // interrupted.
                 playAlert()
-                val errorCallback = mErrorCallback
-                errorCallback?.run()
+                errorCallback?.invoke()
             }
         }
         this.listenThread = lt
@@ -181,8 +178,7 @@ class ListenService : Service() {
                     val decodedBytes = ShortArray(decoded)
                     System.arraycopy(decodedBuffer, 0, decodedBytes, 0, decoded)
                     volumeHistory.onAudioData(decodedBytes)
-                    val updateCallback = mUpdateCallback
-                    updateCallback?.run()
+                    updateCallback?.invoke()
                 }
             }
         } catch (e: Exception) {

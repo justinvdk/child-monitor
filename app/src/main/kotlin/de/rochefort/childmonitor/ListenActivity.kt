@@ -65,10 +65,10 @@ class ListenActivity : Activity() {
     private fun ensureServiceRunningAndBind(bundle: Bundle?) {
         val context: Context = this
         val intent = Intent(context, ListenService::class.java)
-        if (bundle != null) {
-            intent.putExtra("name", bundle.getString("name"))
-            intent.putExtra("address", bundle.getString("address"))
-            intent.putExtra("port", bundle.getInt("port"))
+        bundle?.let {
+            intent.putExtra("name", it.getString("name"))
+            intent.putExtra("address", it.getString("address"))
+            intent.putExtra("port", it.getInt("port"))
             ContextCompat.startForegroundService(context, intent)
         }
         // Attempts to establish a connection with the service.  We use an
