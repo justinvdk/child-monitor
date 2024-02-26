@@ -41,12 +41,12 @@ import java.net.Socket
 
 class MonitorService : Service() {
     private val binder: IBinder = MonitorBinder()
-    private var nsdManager: NsdManager? = null
+    private lateinit var nsdManager: NsdManager
     private var registrationListener: RegistrationListener? = null
     private var currentSocket: ServerSocket? = null
     private var connectionToken: Any? = null
     private var currentPort = 0
-    private var notificationManager: NotificationManager? = null
+    private lateinit var notificationManager: NotificationManager
     private var monitorThread: Thread? = null
     private var monitorActivity: MonitorActivity? = null
     fun setMonitorActivity(monitorActivity: MonitorActivity?) {
@@ -195,7 +195,7 @@ class MonitorService : Service() {
                 Log.e(TAG, "Unregistration failed: $errorCode")
             }
         }
-        nsdManager!!.registerService(
+        nsdManager.registerService(
                 serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener)
     }
 
@@ -203,7 +203,7 @@ class MonitorService : Service() {
         this.registrationListener?.let {
             this.registrationListener = null
             Log.i(TAG, "Unregistering monitoring service")
-            this.nsdManager!!.unregisterService(it)
+            this.nsdManager.unregisterService(it)
         }
     }
 
@@ -214,7 +214,7 @@ class MonitorService : Service() {
                     "Foreground Service Channel",
                     NotificationManager.IMPORTANCE_DEFAULT
             )
-            this.notificationManager!!.createNotificationChannel(serviceChannel)
+            this.notificationManager.createNotificationChannel(serviceChannel)
         }
     }
 
@@ -246,7 +246,7 @@ class MonitorService : Service() {
         }
 
         // Cancel the persistent notification.
-        this.notificationManager!!.cancel(R.string.listening)
+        this.notificationManager.cancel(R.string.listening)
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         // Tell the user we stopped.
         Toast.makeText(this, R.string.stopped, Toast.LENGTH_SHORT).show()

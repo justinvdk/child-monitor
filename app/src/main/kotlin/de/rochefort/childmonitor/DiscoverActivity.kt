@@ -34,11 +34,11 @@ import android.widget.ListView
 import android.widget.Toast
 
 class DiscoverActivity : Activity() {
-    private var nsdManager: NsdManager? = null
+    private lateinit var nsdManager: NsdManager
     private var discoveryListener: DiscoveryListener? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i(TAG, "ChildMonitor start")
-        nsdManager = this.getSystemService(NSD_SERVICE) as NsdManager
+        this.nsdManager = this.getSystemService(NSD_SERVICE) as NsdManager
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_discover)
         val discoverChildButton = findViewById<Button>(R.id.discoverChildButton)
@@ -94,7 +94,7 @@ class DiscoverActivity : Activity() {
         this.discoveryListener?.let {
             this.discoveryListener = null
             Log.i(TAG, "Unregistering monitoring service")
-            this.nsdManager!!.stopServiceDiscovery(it)
+            this.nsdManager.stopServiceDiscovery(it)
         }
         super.onDestroy()
     }

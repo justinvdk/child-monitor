@@ -43,7 +43,7 @@ class ListenService : Service() {
     private val bufferSize = AudioTrack.getMinBufferSize(frequency, channelConfiguration, audioEncoding)
     private val byteBufferSize = bufferSize * 2
     private val binder: IBinder = ListenBinder()
-    private var notificationManager: NotificationManager? = null
+    private lateinit var notificationManager: NotificationManager
     private var listenThread: Thread? = null
     val volumeHistory = VolumeHistory(16384)
     var childDeviceName: String? = null
@@ -79,7 +79,7 @@ class ListenService : Service() {
 
         // Cancel the persistent notification.
         val NOTIFICATION = R.string.listening
-        notificationManager!!.cancel(NOTIFICATION)
+        notificationManager.cancel(NOTIFICATION)
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         // Tell the user we stopped.
         Toast.makeText(this, R.string.stopped, Toast.LENGTH_SHORT).show()
@@ -115,7 +115,7 @@ class ListenService : Service() {
                     "Foreground Service Channel",
                     NotificationManager.IMPORTANCE_DEFAULT
             )
-            notificationManager!!.createNotificationChannel(serviceChannel)
+            notificationManager.createNotificationChannel(serviceChannel)
         }
     }
 
