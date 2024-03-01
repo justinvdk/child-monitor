@@ -160,7 +160,7 @@ class ListenService : Service() {
         lt.start()
     }
 
-    private fun withAudioTrack(block: (AudioTrack) -> Unit): Unit {
+    private fun withAudioTrack(block: (AudioTrack) -> Unit) {
         Log.i(TAG, "Setting up stream")
         val audioTrack = AudioTrack(AudioManager.STREAM_MUSIC,
             frequency,
