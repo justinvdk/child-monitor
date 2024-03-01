@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  * Taken from https://android.googlesource.com/platform/external/nist-sip/+/6f95fdeab4481188b6260041b41d1db12b101266/src/com/android/sip/media/G711UCodec.java
- * This file has been converted to Kotlin.
+ * Adopted to the needs of the Child Monitor project.
  */
 package de.rochefort.childmonitor.audio
 
