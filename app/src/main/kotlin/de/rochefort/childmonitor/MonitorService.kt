@@ -178,6 +178,7 @@ class MonitorService : Service() {
                             portText.text = port.toString()
                         }
                     }
+                }
             }
 
             override fun onRegistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
