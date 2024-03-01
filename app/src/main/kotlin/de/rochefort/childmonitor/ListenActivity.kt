@@ -47,7 +47,7 @@ class ListenActivity : Activity() {
             val connectedText = findViewById<TextView>(R.id.connectedTo)
             connectedText.text = bs.childDeviceName
             val volumeView = findViewById<VolumeView>(R.id.volume)
-            volumeView.setVolumeHistory(bs.volumeHistory)
+            volumeView.volumeHistory = bs.volumeHistory
             bs.setUpdateCallback { volumeView.postInvalidate() }
             bs.setErrorCallback { postErrorMessage() }
         }

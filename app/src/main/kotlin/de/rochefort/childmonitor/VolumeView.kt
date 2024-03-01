@@ -26,7 +26,7 @@ import kotlin.math.min
 
 class VolumeView : View {
     private val paint: Paint
-    private var volumeHistory: VolumeHistory? = null
+    public var volumeHistory: VolumeHistory? = null
 
     constructor(context: Context?) : super(context) {
         paint = initPaint()
@@ -84,9 +84,5 @@ class VolumeView : View {
             xPrev = xNext
             yPrev = yNext
         }
-    }
-
-    fun setVolumeHistory(volumeHistory: VolumeHistory?) {
-        this.volumeHistory = volumeHistory
     }
 }
