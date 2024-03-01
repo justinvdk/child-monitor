@@ -197,7 +197,7 @@ class ListenService : Service() {
                 }
             }
         } catch (e: IOException) {
-            Log.e(TAG, "Failed to read from socket due to ")
+            Log.e(TAG, "Failed to read from socket due to ", e)
         }
     }
 
