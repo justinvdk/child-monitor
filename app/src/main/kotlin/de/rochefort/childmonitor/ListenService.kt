@@ -33,6 +33,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import java.io.IOException
 import java.io.InputStream
 import java.net.Socket
 
@@ -134,16 +135,13 @@ class ListenService : Service() {
     private fun doListen(address: String?, port: Int) {
         val lt = Thread {
             Socket(address, port).use { socket ->
-                val result = runCatching { socket.getInputStream() }
-                if (result.isSuccess) {
-                    result.getOrNull()?.let {inputStream ->
-                        withAudioTrack { audioTrack ->
-                            streamAudio(inputStream, audioTrack)
-                        }
+                try {
+                    val inputStream = socket.getInputStream()
+                    withAudioTrack { audioTrack ->
+                        streamAudio(inputStream, audioTrack)
                     }
                 }
-                else {
-                    val exception = result.exceptionOrNull()
+                catch (exception : IOException) {
                     Log.e(TAG, "Failed to stream audio", exception)
                 }
             }
@@ -168,36 +166,38 @@ class ListenService : Service() {
             audioEncoding,
             bufferSize,
             AudioTrack.MODE_STREAM)
-        val playback = runCatching { audioTrack.play() }
-        if (playback.isFailure) {
-            Log.e(TAG, "Failed to start output due to ", playback.exceptionOrNull())
-            return
+        try {
+            audioTrack.play()
+            block(audioTrack)
         }
-
-        runCatching { block(audioTrack) }
-        audioTrack.stop()
+        catch (e : java.lang.IllegalStateException ) {
+            Log.e(TAG, "Failed to start output due to ", e)
+        }
+        finally {
+            audioTrack.stop()
+        }
     }
 
     private fun streamAudio(inputStream: InputStream, audioTrack: AudioTrack) {
         val readBuffer = ByteArray(byteBufferSize)
         val decodedBuffer = ShortArray(byteBufferSize * 2)
-        while (!Thread.currentThread().isInterrupted) {
-            val read = runCatching { inputStream.read(readBuffer) }
-            if (read.isFailure) {
-                return
+        try {
+            while (!Thread.currentThread().isInterrupted) {
+                val len = inputStream.read(readBuffer)
+                if (len < 0) {
+                    return
+                }
+                val decoded: Int = AudioCodecDefines.CODEC.decode(decodedBuffer, readBuffer, len, 0)
+                if (decoded > 0) {
+                    audioTrack.write(decodedBuffer, 0, decoded)
+                    val decodedBytes = ShortArray(decoded)
+                    System.arraycopy(decodedBuffer, 0, decodedBytes, 0, decoded)
+                    volumeHistory.onAudioData(decodedBytes)
+                    updateCallback?.invoke()
+                }
             }
-            val len = read.getOrDefault(-1)
-            if (len < 0) {
-                return
-            }
-            val decoded: Int = AudioCodecDefines.CODEC.decode(decodedBuffer, readBuffer, len, 0)
-            if (decoded > 0) {
-                audioTrack.write(decodedBuffer, 0, decoded)
-                val decodedBytes = ShortArray(decoded)
-                System.arraycopy(decodedBuffer, 0, decodedBytes, 0, decoded)
-                volumeHistory.onAudioData(decodedBytes)
-                updateCallback?.invoke()
-            }
+        } catch (e: IOException) {
+            Log.e(TAG, "Failed to read from socket due to ")
         }
     }
 
