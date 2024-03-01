@@ -22,6 +22,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import kotlin.math.min
 
 class VolumeView : View {
     private val paint: Paint
@@ -52,8 +53,7 @@ class VolumeView : View {
         val size = volumeHistory.size() // Size is at most width
         val volumeNorm = volumeHistory.volumeNorm
         val relativeBrightness: Double = if (size > 0) {
-            val normalizedVolume = volumeHistory[size - 1]
-            Math.max(0.3, normalizedVolume)
+            volumeHistory[size - 1].coerceAtLeast(0.3)
         } else {
             0.3
         }
@@ -73,11 +73,11 @@ class VolumeView : View {
         }
         val margins = height * 0.1
         val graphHeight = height - 2.0 * margins
-        val leftMost = Math.max(0, volumeHistory.size() - width)
+        val leftMost = (volumeHistory.size() - width).coerceAtLeast(0)
         val graphScale = graphHeight * volumeNorm
         var xPrev = 0
         var yPrev = (margins + graphHeight - volumeHistory[leftMost] * graphScale).toInt()
-        val length = Math.min(size, width)
+        val length = min(size, width)
         for (xNext in 1 until length - 1) {
             val yNext = (margins + graphHeight - volumeHistory[leftMost + xNext] * graphScale).toInt()
             canvas.drawLine(xPrev.toFloat(), yPrev.toFloat(), xNext.toFloat(), yNext.toFloat(), paint)

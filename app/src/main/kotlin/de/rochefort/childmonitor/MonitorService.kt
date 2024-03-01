@@ -166,17 +166,18 @@ class MonitorService : Service() {
                 // Save the service name.  Android may have changed it in order to
                 // resolve a conflict, so update the name you initially requested
                 // with the name Android actually used.
-                val serviceName = nsdServiceInfo.serviceName
-                Log.i(TAG, "Service name: $serviceName")
-                val ma = monitorActivity
-                ma?.runOnUiThread {
-                    val statusText = ma.findViewById<TextView>(R.id.textStatus)
-                    statusText.setText(R.string.waitingForParent)
-                    val serviceText = ma.findViewById<TextView>(R.id.textService)
-                    serviceText.text = serviceName
-                    val portText = ma.findViewById<TextView>(R.id.port)
-                    portText.text = Integer.toString(port)
-                }
+                nsdServiceInfo.serviceName.let { serviceName ->
+                    Log.i(TAG, "Service name: $serviceName")
+                    monitorActivity?.let { ma ->
+                        ma.runOnUiThread {
+                            val statusText = ma.findViewById<TextView>(R.id.textStatus)
+                            statusText.setText(R.string.waitingForParent)
+                            val serviceText = ma.findViewById<TextView>(R.id.textService)
+                            serviceText.text = serviceName
+                            val portText = ma.findViewById<TextView>(R.id.port)
+                            portText.text = port.toString()
+                        }
+                    }
             }
 
             override fun onRegistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
@@ -237,13 +238,13 @@ class MonitorService : Service() {
         unregisterService()
         this.connectionToken = null
         this.currentSocket?.let {
-            this.currentSocket = null
             try {
                 it.close()
             } catch (e: IOException) {
                 Log.e(TAG, "Failed to close active socket on port $currentPort")
             }
         }
+        this.currentSocket = null
 
         // Cancel the persistent notification.
         this.notificationManager.cancel(R.string.listening)

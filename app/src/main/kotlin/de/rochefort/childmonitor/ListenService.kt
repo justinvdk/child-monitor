@@ -72,14 +72,11 @@ class ListenService : Service() {
     }
 
     override fun onDestroy() {
-        this.listenThread?.let {
-            this.listenThread = null
-            it.interrupt()
-        }
+        this.listenThread?.interrupt()
+        this.listenThread = null
 
         // Cancel the persistent notification.
-        val NOTIFICATION = R.string.listening
-        notificationManager.cancel(NOTIFICATION)
+        notificationManager.cancel(R.string.listening)
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         // Tell the user we stopped.
         Toast.makeText(this, R.string.stopped, Toast.LENGTH_SHORT).show()
