@@ -34,7 +34,6 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import java.io.IOException
-import java.io.InputStream
 import java.net.Socket
 
 class ListenService : Service() {
@@ -134,15 +133,11 @@ class ListenService : Service() {
     private var updateCallback: (() -> Unit)? = null
     private fun doListen(address: String?, port: Int) {
         val lt = Thread {
-            Socket(address, port).use { socket ->
-                try {
-                    val inputStream = socket.getInputStream()
-                    withAudioTrack { audioTrack ->
-                        streamAudio(inputStream, audioTrack)
-                    }
-                }
-                catch (exception : IOException) {
-                    Log.e(TAG, "Failed to stream audio", exception)
+            val socket = Socket(address, port)
+            streamAudio(socket).onFailure { e ->
+                when (e) {
+                    is IOException -> Log.e(TAG, "Failed to stream audio", e)
+                    else -> Log.e(TAG, "Failed to stream audio for other reason", e)
                 }
             }
             if (!Thread.currentThread().isInterrupted) {
@@ -158,7 +153,7 @@ class ListenService : Service() {
         lt.start()
     }
 
-    private fun withAudioTrack(block: (AudioTrack) -> Unit) {
+    private fun streamAudio(socket: Socket): Result<Int> {
         Log.i(TAG, "Setting up stream")
         val audioTrack = AudioTrack(AudioManager.STREAM_MUSIC,
             frequency,
@@ -168,24 +163,25 @@ class ListenService : Service() {
             AudioTrack.MODE_STREAM)
         try {
             audioTrack.play()
-            block(audioTrack)
         }
-        catch (e : java.lang.IllegalStateException ) {
-            Log.e(TAG, "Failed to start output due to ", e)
+        catch (e : java.lang.IllegalStateException) {
+            return Result.failure(e)
         }
-        finally {
-            audioTrack.stop()
-        }
-    }
 
-    private fun streamAudio(inputStream: InputStream, audioTrack: AudioTrack) {
+        val inputStream = try {
+            socket.getInputStream()
+        }
+        catch (e: IOException) {
+            return Result.failure(e)
+        }
+
         val readBuffer = ByteArray(byteBufferSize)
         val decodedBuffer = ShortArray(byteBufferSize * 2)
         try {
             while (!Thread.currentThread().isInterrupted) {
                 val len = inputStream.read(readBuffer)
                 if (len < 0) {
-                    return
+                    return Result.success(len)
                 }
                 val decoded: Int = AudioCodecDefines.CODEC.decode(decodedBuffer, readBuffer, len, 0)
                 if (decoded > 0) {
@@ -196,9 +192,13 @@ class ListenService : Service() {
                     updateCallback?.invoke()
                 }
             }
-        } catch (e: IOException) {
-            Log.e(TAG, "Failed to read from socket due to ", e)
+        } catch (e: Exception) {
+            Log.e(TAG, "Connection failed", e)
+        } finally {
+            audioTrack.stop()
+            socket.close()
         }
+        return Result.success(0) // Not really a success, but that's how it maps
     }
 
     private fun playAlert() {
