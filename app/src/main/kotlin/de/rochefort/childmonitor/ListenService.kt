@@ -133,8 +133,14 @@ class ListenService : Service() {
     private var updateCallback: (() -> Unit)? = null
     private fun doListen(address: String?, port: Int) {
         val lt = Thread {
-            val socket = Socket(address, port)
-            streamAudio(socket).onFailure { e ->
+            try {
+                Result.success(Socket(address, port))
+            } catch (e : IOException) {
+                Result.failure(e)
+            }.fold(
+                { streamAudio(it) },    // This also may return a failure
+                { Result.failure(it) }  // Or we already have one
+            ).onFailure { e ->
                 when (e) {
                     is IOException -> Log.e(TAG, "Failed to stream audio", e)
                     else -> Log.e(TAG, "Failed to stream audio for other reason", e)
