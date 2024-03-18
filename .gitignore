@@ -7,3 +7,6 @@
 /app/build
 /app/release
 /captures
+release-signed.apk
+release-signed.apk.idsig
+release-unsigned-aligned.apk
