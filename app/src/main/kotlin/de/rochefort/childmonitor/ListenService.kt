@@ -135,6 +135,7 @@ class ListenService : Service() {
         val lt = Thread {
             try {
                 val socket = Socket(address, port)
+                socket.soTimeout = 5_000
                 val success = streamAudio(socket)
                 if (!success) {
                     playAlert()
