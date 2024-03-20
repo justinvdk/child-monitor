@@ -176,7 +176,8 @@ class ListenService : Service() {
             while (!Thread.currentThread().isInterrupted) {
                 val len = inputStream.read(readBuffer)
                 if (len < 0) {
-                    return true
+                    // If the current thread was not interrupted this means the remote stopped streaming
+                    return Thread.currentThread().isInterrupted
                 }
                 val decoded: Int = AudioCodecDefines.CODEC.decode(decodedBuffer, readBuffer, len, 0)
                 if (decoded > 0) {
