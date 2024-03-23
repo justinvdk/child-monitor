@@ -14,20 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Child Monitor. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.rochefort.childmonitor;
+package de.rochefort.childmonitor
 
-import android.media.AudioFormat;
+import android.media.AudioFormat
+import de.rochefort.childmonitor.audio.G711UCodec
 
-import de.rochefort.childmonitor.audio.G711UCodec;
-
-public class AudioCodecDefines {
-    public static final int FREQUENCY = 8000;
-    public static final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
-    public static final G711UCodec CODEC = new G711UCodec();
-    public static final int CHANNEL_CONFIGURATION_IN = AudioFormat.CHANNEL_IN_MONO;
-    public static final int CHANNEL_CONFIGURATION_OUT = AudioFormat.CHANNEL_OUT_MONO;
-
-    private AudioCodecDefines() {
-        throw new IllegalStateException("Do not instantiate!");
-    }
+object AudioCodecDefines {
+    const val FREQUENCY = 8000
+    const val ENCODING = AudioFormat.ENCODING_PCM_16BIT
+    val CODEC = G711UCodec()
+    const val CHANNEL_CONFIGURATION_IN = AudioFormat.CHANNEL_IN_MONO
+    const val CHANNEL_CONFIGURATION_OUT = AudioFormat.CHANNEL_OUT_MONO
 }
