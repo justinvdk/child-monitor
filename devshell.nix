@@ -42,6 +42,6 @@ devshell.mkShell {
   ];
   packages = [
     androidSdk
-    jdk17
+    jdk21
   ];
 }
